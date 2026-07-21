@@ -1,0 +1,225 @@
+export const phaseGroups = [
+  { id: 'canil', title: 'Canil · neonatal', phases: '1-5', span: '20-55 dias', color: '#5DA82C' },
+  { id: 'socializacao', title: 'Socialização', phases: '6-10', span: 'família', color: '#23348C' },
+  { id: 'aptidao', title: 'Avaliação de aptidão', phases: '11-12', span: '6-12 meses', color: '#B8860B' },
+  { id: 'castracao', title: 'Castração · retorno', phases: '13-15', span: 'retorno', color: '#6D28D9' },
+  { id: 'treino', title: 'Treinamento formal', phases: '16', span: 'pré-entrega', color: '#1E5B2E' },
+  { id: 'entrega', title: 'Entrega', phases: '17', span: 'final', color: '#C2410C' }
+];
+
+export const phases = [
+  'Nascimento',
+  'Puppy / Influenza',
+  '1ª vermifugação',
+  '1ª múltipla',
+  'Pré-família',
+  '2ª múltipla',
+  '3ª múltipla',
+  'Antirrábica',
+  'Família socializadora',
+  'Acompanhamento',
+  'Avaliação 6 meses',
+  'Bateria completa',
+  'Pré-castração',
+  'Castração',
+  'Retorno clínico',
+  'Pré-entrega',
+  'Entregue'
+];
+
+export const dogs = [
+  {
+    name: 'Lis',
+    code: 'LIS',
+    rga: 'HK-2024-0142',
+    sex: 'Fêmea',
+    breed: 'Labrador',
+    coat: 'Amarela',
+    phase: 16,
+    group: 'treino',
+    trainer: 'Marina Souza',
+    socializer: 'Família Andrade',
+    birth: '12/05/2024',
+    mother: 'Dora',
+    father: 'Atlas',
+    chip: '985141000342881',
+    alert: 'Otite bilateral',
+    health: 'alert',
+    progress: 94
+  },
+  {
+    name: 'Nobel',
+    code: 'NOB',
+    rga: 'HK-2025-0031',
+    sex: 'Macho',
+    breed: 'Golden Retriever',
+    coat: 'Dourada',
+    phase: 9,
+    group: 'socializacao',
+    trainer: 'Paulo Neri',
+    socializer: 'Família Lima',
+    birth: '03/01/2025',
+    mother: 'Lua',
+    father: 'Max',
+    chip: '',
+    alert: 'Microchip pendente',
+    health: 'alert',
+    progress: 53
+  },
+  {
+    name: 'Íris',
+    code: 'IRI',
+    rga: 'HK-2025-0058',
+    sex: 'Fêmea',
+    breed: 'Labrador',
+    coat: 'Preta',
+    phase: 4,
+    group: 'canil',
+    trainer: 'Bruna Reis',
+    socializer: 'A definir',
+    birth: '09/04/2025',
+    mother: 'Nina',
+    father: 'Theo',
+    chip: '985141000642331',
+    alert: '',
+    health: 'ok',
+    progress: 24
+  },
+  {
+    name: 'Duque',
+    code: 'DUQ',
+    rga: 'HK-2025-0060',
+    sex: 'Macho',
+    breed: 'Labrador',
+    coat: 'Chocolate',
+    phase: 2,
+    group: 'canil',
+    trainer: 'Bruna Reis',
+    socializer: 'A definir',
+    birth: '22/04/2025',
+    mother: 'Maya',
+    father: 'Bolt',
+    chip: '985141000642522',
+    alert: '',
+    health: 'ok',
+    progress: 12
+  },
+  {
+    name: 'Vasco',
+    code: 'VAS',
+    rga: 'HK-2024-0119',
+    sex: 'Macho',
+    breed: 'Golden Retriever',
+    coat: 'Creme',
+    phase: 10,
+    group: 'socializacao',
+    trainer: 'Paulo Neri',
+    socializer: 'Família Rocha',
+    birth: '20/08/2024',
+    mother: 'Lola',
+    father: 'Ozzy',
+    chip: '985141000128907',
+    alert: '',
+    health: 'ok',
+    progress: 59
+  },
+  {
+    name: 'Thor',
+    code: 'THO',
+    rga: 'HK-2024-0098',
+    sex: 'Macho',
+    breed: 'Labrador',
+    coat: 'Amarela',
+    phase: 12,
+    group: 'aptidao',
+    trainer: 'Marina Souza',
+    socializer: 'Família Martins',
+    birth: '14/03/2024',
+    mother: 'Kiara',
+    father: 'Apollo',
+    chip: '985141000112764',
+    alert: '',
+    health: 'ok',
+    progress: 71
+  },
+  {
+    name: 'Estrela',
+    code: 'EST',
+    rga: 'HK-2024-0071',
+    sex: 'Fêmea',
+    breed: 'Golden Retriever',
+    coat: 'Dourada',
+    phase: 14,
+    group: 'castracao',
+    trainer: 'Carla Menezes',
+    socializer: 'Família Costa',
+    birth: '11/02/2024',
+    mother: 'Mel',
+    father: 'Simba',
+    chip: '985141000109221',
+    alert: '',
+    health: 'ok',
+    progress: 82
+  },
+  {
+    name: 'Maggie',
+    code: 'MAG',
+    rga: 'HK-2023-0044',
+    sex: 'Fêmea',
+    breed: 'Labrador',
+    coat: 'Preta',
+    phase: 17,
+    group: 'entrega',
+    trainer: 'Carla Menezes',
+    socializer: 'Família Alves',
+    birth: '18/09/2023',
+    mother: 'Gaia',
+    father: 'Nick',
+    chip: '985141000091332',
+    alert: '',
+    health: 'ok',
+    progress: 100
+  }
+];
+
+export const healthEvents = [
+  {
+    type: 'Vacinação',
+    date: '10/07/2026',
+    phase: '3ª múltipla',
+    title: 'V10 aplicada',
+    desc: 'Lote V10-4487, reforço calculado para 31/07/2026.',
+    color: 'blue'
+  },
+  {
+    type: 'Exame / laudo',
+    date: '08/07/2026',
+    phase: 'Bateria completa',
+    title: 'Hemograma revisado',
+    desc: 'Sem alterações críticas. Laudo anexado ao prontuário.',
+    color: 'amber'
+  },
+  {
+    type: 'Intercorrência',
+    date: '05/07/2026',
+    phase: 'Pré-entrega',
+    title: 'Otite bilateral',
+    desc: 'Tratamento tópico iniciado e retorno em 7 dias.',
+    color: 'orange'
+  }
+];
+
+export const commandGroups = [
+  { label: 'Rotina e cuidados', value: 86 },
+  { label: 'Equipamentos', value: 78 },
+  { label: 'Comandos de direção', value: 72 },
+  { label: 'Busca e procura', value: 63 },
+  { label: 'Obstáculos', value: 69 },
+  { label: 'Ambientes e transporte', value: 81 },
+  { label: 'Distrações', value: 58 },
+  { label: 'Contextos de treino', value: 74 }
+];
+
+export function groupForDog(dog) {
+  return phaseGroups.find((group) => group.id === dog.group);
+}

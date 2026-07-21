@@ -1,0 +1,129 @@
+﻿.split-layout,
+.config-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.8fr);
+  gap: 16px;
+}
+
+.training-table,
+.progress-panel,
+.timeline-panel,
+.social-form,
+.event-types,
+.phase-timeline {
+  padding: 16px;
+}
+
+.training-table header {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+h3 {
+  margin: 0 0 12px;
+  color: var(--forest);
+}
+
+.legend {
+  gap: 8px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.mark,
+.cell {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.mark.x,
+.cell.x {
+  color: #fff;
+  background: var(--leaf);
+}
+
+.mark.v,
+.cell.v {
+  color: #fff;
+  background: var(--amber);
+}
+
+.mark.d,
+.cell.d {
+  color: #fff;
+  background: var(--purple);
+}
+
+.mark.f,
+.cell.f {
+  color: #fff;
+  background: #6b7280;
+}
+
+.mark.n,
+.cell.n {
+  color: #fff;
+  background: var(--orange);
+}
+
+.month-grid {
+  display: grid;
+  grid-template-columns: 120px repeat(var(--days), 34px);
+  overflow-x: auto;
+}
+
+.corner,
+.day,
+.command-name,
+.cell {
+  min-height: 34px;
+  border: 1px solid var(--line);
+}
+
+.corner,
+.day,
+.command-name {
+  display: grid;
+  place-items: center;
+  padding: 0 8px;
+  background: #f1f5ef;
+  font-weight: 700;
+}
+
+.command-name {
+  justify-content: start;
+  place-items: center start;
+  background: #fff;
+}
+
+.day.weekend {
+  color: #fff;
+  background: #4b5563;
+}
+
+.cell {
+  width: 34px;
+  height: 34px;
+  border-radius: 0;
+  background: #fff;
+}
+
+.area-progress {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+
+.area-progress div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}

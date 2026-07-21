@@ -1,0 +1,245 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap');
+
+:root {
+  --paper: #f7f8f4;
+  --panel: #ffffff;
+  --ink: #172019;
+  --muted: #66736a;
+  --line: #dfe6dc;
+  --leaf: #5da82c;
+  --forest: #1e5b2e;
+  --blue: #23348c;
+  --orange: #c2410c;
+  --amber: #b8860b;
+  --purple: #6d28d9;
+  --shadow: 0 16px 36px rgba(30, 91, 46, 0.11);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+  letter-spacing: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.brand-header {
+  display: grid;
+  grid-template-columns: minmax(230px, 0.8fr) minmax(360px, 1.5fr) minmax(180px, 0.7fr);
+  gap: 24px;
+  align-items: center;
+  padding: 20px 28px;
+  background: #fff;
+  border-bottom: 4px solid var(--leaf);
+}
+
+.brand-mark,
+.cert-stack,
+.logo-badge,
+.nav-scroll a,
+.primary-action,
+.ghost-action,
+.dog-card-top,
+.lane-header,
+.screen-heading,
+.tabs,
+.hero-alert,
+.health-alert,
+.health-ok,
+.vaccine-item,
+.legend,
+.event-types button {
+  display: flex;
+  align-items: center;
+}
+
+.brand-mark {
+  gap: 12px;
+}
+
+.brand-mark strong,
+.brand-mark span,
+.cert-stack span,
+td small {
+  display: block;
+}
+
+.brand-mark span,
+.header-title p,
+.cert-stack span,
+.eyebrow,
+.kpi-card span,
+td small,
+.data-field span,
+.select-field span,
+.doc-card span,
+.vaccine-item span,
+.phase-timeline p,
+.route-log p {
+  color: var(--muted);
+}
+
+.logo-badge {
+  width: 54px;
+  height: 54px;
+  justify-content: center;
+  border-radius: 8px;
+  color: #fff;
+  background: var(--forest);
+}
+
+.header-title {
+  text-align: center;
+}
+
+.header-title p,
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.header-title h1 {
+  margin: 0;
+  font-size: clamp(1.25rem, 2vw, 2rem);
+  color: var(--forest);
+}
+
+.cert-stack {
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cert-stack span {
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfa;
+}
+
+.top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0 28px;
+  background: var(--forest);
+  box-shadow: 0 10px 24px rgba(23, 32, 25, 0.12);
+}
+
+.nav-scroll {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+}
+
+.nav-scroll a {
+  gap: 8px;
+  min-height: 54px;
+  padding: 0 4px;
+  border: 0;
+  border-bottom: 4px solid transparent;
+  color: #fff;
+  background: transparent;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-scroll a.active {
+  border-bottom-color: var(--leaf);
+}
+
+.session-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.session-menu button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 8px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.main-frame {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.animate-in {
+  animation: enter 0.25s ease both;
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.screen-heading {
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.screen-heading h2,
+.record-hero h2 {
+  margin: 0;
+  color: var(--blue);
+  font-size: clamp(1.35rem, 2vw, 2.15rem);
+}
+
+.primary-action,
+.ghost-action {
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.primary-action {
+  border: 1px solid var(--forest);
+  color: #fff;
+  background: var(--forest);
+}
+
+.ghost-action {
+  border: 1px solid var(--line);
+  color: var(--forest);
+  background: #fff;
+}

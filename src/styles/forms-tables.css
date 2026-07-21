@@ -1,0 +1,110 @@
+﻿.filters-bar {
+  display: grid;
+  grid-template-columns: minmax(240px, 1.4fr) repeat(3, minmax(140px, 0.7fr)) auto;
+  gap: 12px;
+  align-items: end;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.search-field,
+.select-field,
+.data-field,
+.social-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.search-field {
+  position: relative;
+}
+
+.search-field svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  color: var(--muted);
+  transform: translateY(-50%);
+}
+
+.search-field input {
+  padding-left: 38px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: #fff;
+}
+
+textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.table-shell {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 940px;
+}
+
+th,
+td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+th {
+  color: var(--forest);
+  background: #f1f5ef;
+  font-size: 0.86rem;
+  text-transform: uppercase;
+}
+
+tbody tr {
+  cursor: pointer;
+}
+
+.phase-pill,
+.event-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.phase-pill {
+  color: var(--pill);
+  background: color-mix(in srgb, var(--pill) 12%, white);
+}
+
+.mini-track {
+  width: 160px;
+  height: 6px;
+  margin-top: 7px;
+}
+
+.health-alert,
+.health-ok {
+  gap: 6px;
+  font-weight: 700;
+}
+
+.health-ok {
+  color: var(--forest);
+}

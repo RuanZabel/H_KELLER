@@ -1,0 +1,197 @@
+﻿.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.kpi-card,
+.lane,
+.table-shell,
+.timeline-panel,
+.progress-panel,
+.training-table,
+.social-form,
+.record-hero,
+.doc-card,
+.event-types,
+.phase-timeline,
+.filters-bar {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.kpi-card {
+  padding: 18px;
+  border-left: 5px solid var(--leaf);
+}
+
+.kpi-card.blue {
+  border-left-color: var(--blue);
+}
+
+.kpi-card.amber {
+  border-left-color: var(--amber);
+}
+
+.kpi-card.orange {
+  border-left-color: var(--orange);
+}
+
+.kpi-card strong {
+  display: block;
+  margin: 6px 0;
+  color: var(--forest);
+  font-size: 1.9rem;
+}
+
+.kpi-card p {
+  margin: 0;
+}
+
+.panel-search {
+  display: grid;
+  grid-template-columns: minmax(260px, 520px) auto;
+  gap: 12px;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 16px;
+}
+
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(210px, 1fr));
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.lane {
+  min-width: 210px;
+  padding: 12px;
+  border-top: 5px solid var(--lane);
+}
+
+.lane-header {
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.lane-header div {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--lane);
+}
+
+.phase-strip {
+  margin: 10px 0;
+  padding: 8px;
+  border-radius: 6px;
+  color: var(--forest);
+  background: color-mix(in srgb, var(--lane) 13%, white);
+  font-size: 0.88rem;
+}
+
+.dog-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.lane-empty {
+  margin: 0;
+  padding: 12px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  background: #fbfcfa;
+  font-size: 0.9rem;
+}
+
+.dog-card {
+  width: 100%;
+  padding: 12px;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.dog-card:hover,
+tbody tr:hover,
+.event-types button:hover {
+  border-color: var(--leaf);
+  background: #fbfff8;
+}
+
+.dog-card-top {
+  gap: 10px;
+}
+
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background: #edf6e8;
+}
+
+.avatar.large {
+  width: 68px;
+  height: 68px;
+  font-size: 1.55rem;
+}
+
+.dog-card small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.alert-icon,
+.health-alert,
+.hero-alert {
+  color: var(--orange);
+}
+
+.alert-icon {
+  margin-left: auto;
+}
+
+.phase-line {
+  display: grid;
+  gap: 2px;
+  margin: 12px 0 8px;
+  font-size: 0.9rem;
+}
+
+.phase-line span {
+  color: var(--muted);
+}
+
+.progress-track,
+.mini-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e9eee7;
+}
+
+.progress-track span,
+.mini-track span {
+  display: block;
+  height: 100%;
+  background: var(--leaf);
+}

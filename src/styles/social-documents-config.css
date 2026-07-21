@@ -1,0 +1,152 @@
+﻿.social-form {
+  display: grid;
+  gap: 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.binary-grid,
+.chip-grid,
+.documents-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.binary-grid button,
+.chip-grid span {
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+}
+
+.binary-grid .selected,
+.chip-grid .selected {
+  border-color: var(--forest);
+  color: #fff;
+  background: var(--forest);
+}
+
+.documents-grid {
+  align-items: stretch;
+}
+
+.doc-card {
+  display: grid;
+  gap: 8px;
+  width: min(100%, 260px);
+  padding: 16px;
+  text-align: left;
+  color: var(--ink);
+}
+
+.doc-card.add {
+  border-style: dashed;
+}
+
+.event-types {
+  display: grid;
+  gap: 10px;
+}
+
+.event-types button {
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: #fff;
+}
+
+.config-dot {
+  width: 11px;
+  height: 11px;
+  margin-right: auto;
+  border-radius: 999px;
+  background: var(--leaf);
+}
+
+.config-dot.c1 {
+  background: var(--amber);
+}
+
+.config-dot.c2 {
+  background: var(--forest);
+}
+
+.config-dot.c3 {
+  background: var(--purple);
+}
+
+.config-dot.c4 {
+  background: var(--orange);
+}
+
+.config-dot.c5 {
+  background: var(--blue);
+}
+
+.phase-timeline {
+  display: grid;
+  gap: 0;
+}
+
+.phase-timeline article {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 12px;
+  position: relative;
+  padding: 0 0 18px;
+}
+
+.phase-timeline article::after {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 39px;
+  bottom: 0;
+  width: 2px;
+  background: var(--line);
+}
+
+.phase-timeline article:last-child::after {
+  display: none;
+}
+
+.phase-timeline article > span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  font-weight: 700;
+}
+
+.phase-timeline article.done > span {
+  border-color: var(--forest);
+  color: #fff;
+  background: var(--forest);
+}
+
+.phase-timeline article.done::after {
+  background: var(--forest);
+}
+
+.phase-timeline article.current > span {
+  border-color: var(--amber);
+  background: #fff7d8;
+  box-shadow: 0 0 0 6px rgba(184, 134, 11, 0.16);
+}
+
+.phase-timeline p {
+  margin: 4px 0 0;
+}

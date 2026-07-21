@@ -1,0 +1,13 @@
+@import './styles/base.css';
+@import './styles/dashboard.css';
+@import './styles/forms-tables.css';
+@import './styles/dog-record.css';
+@import './styles/training.css';
+@import './styles/health-timeline.css';
+@import './styles/social-documents-config.css';
+@import './styles/auth.css';
+@import './styles/shared-modules.css';
+@import './styles/new-dog-form.css';
+@import './styles/health.css';
+@import './styles/feeding.css';
+@import './styles/responsive.css';
