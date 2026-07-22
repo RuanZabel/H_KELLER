@@ -139,4 +139,18 @@
   .parent-field {
     grid-template-columns: 1fr;
   }
+
+  .parent-modal {
+    max-height: calc(100vh - 28px);
+    padding: 14px;
+  }
+
+  .parent-modal-list button {
+    grid-template-columns: 1fr;
+  }
+
+  .parent-modal-list em {
+    grid-row: auto;
+    width: fit-content;
+  }
 }

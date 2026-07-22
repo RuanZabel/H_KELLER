@@ -1,4 +1,4 @@
-import { AlertTriangle, Check, Dog, Save, Search } from 'lucide-react';
+import { AlertTriangle, Check, Dog, Save, Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PageHeader from '../components/common/PageHeader.jsx';
@@ -17,6 +17,7 @@ const initialForm = {
   pedigree: '',
   breed: '',
   coat: '',
+  isBreeder: false,
   motherOrigin: '',
   motherName: '',
   motherSchoolRga: '',
@@ -51,6 +52,7 @@ export default function NewDogPage() {
   const { addDog, dogs } = useDogs();
   const [form, setForm] = useState(initialForm);
   const [submitted, setSubmitted] = useState(false);
+  const [parentPicker, setParentPicker] = useState(null);
 
   const generatedCode = useMemo(() => {
     const year = new Date().getFullYear();
@@ -64,6 +66,8 @@ export default function NewDogPage() {
   const schoolFathers = useMemo(() => findSchoolBreeders(dogs, 'Macho', form.fatherSearch), [dogs, form.fatherSearch]);
   const selectedMother = dogs.find((dog) => dog.rga === form.motherSchoolRga);
   const selectedFather = dogs.find((dog) => dog.rga === form.fatherSchoolRga);
+  const pickerDogs = parentPicker === 'mother' ? schoolMothers : schoolFathers;
+  const pickerSearch = parentPicker === 'mother' ? form.motherSearch : form.fatherSearch;
 
   function updateField(field, value) {
     setSubmitted(false);
@@ -93,6 +97,7 @@ export default function NewDogPage() {
       [`${parent}Search`]: parentDog.name,
       [`${parent}Color`]: parentDog.coat || ''
     }));
+    setParentPicker(null);
   }
 
   function handleSubmit(event) {
@@ -110,6 +115,7 @@ export default function NewDogPage() {
       sex: form.sex,
       breed: form.breed || 'A definir',
       coat: form.coat || form.color,
+      isBreeder: form.isBreeder,
       phase,
       group: groupByPhase(phase),
       trainer: 'A definir',
@@ -175,6 +181,7 @@ export default function NewDogPage() {
             <TextField label="Pelagem" value={form.coat} onChange={(value) => updateField('coat', value)} />
             <NumberField label="Peso inicial (kg)" value={form.initialWeight} onChange={(value) => updateField('initialWeight', value)} />
             <TextField label="Pedigree" value={form.pedigree} onChange={(value) => updateField('pedigree', value)} />
+            <ToggleField label="É reprodutor" checked={form.isBreeder} onChange={(value) => updateField('isBreeder', value)} />
             <SelectField label="Fase inicial" value={form.initialPhase} onChange={(value) => updateField('initialPhase', value)} options={phases.map((phase, index) => `${index + 1} · ${phase}`)} />
           </FormSection>
 
@@ -183,25 +190,21 @@ export default function NewDogPage() {
               label="Mãe"
               origin={form.motherOrigin}
               name={form.motherName}
-              search={form.motherSearch}
               selectedRga={form.motherSchoolRga}
-              schoolDogs={schoolMothers}
+              selectedDog={selectedMother}
               onOriginChange={(value) => updateField('motherOrigin', value)}
               onNameChange={(value) => updateField('motherName', value)}
-              onSearchChange={(value) => updateField('motherSearch', value)}
-              onSelect={(dog) => selectSchoolParent('mother', dog)}
+              onOpenPicker={() => setParentPicker('mother')}
             />
             <ParentField
               label="Pai"
               origin={form.fatherOrigin}
               name={form.fatherName}
-              search={form.fatherSearch}
               selectedRga={form.fatherSchoolRga}
-              schoolDogs={schoolFathers}
+              selectedDog={selectedFather}
               onOriginChange={(value) => updateField('fatherOrigin', value)}
               onNameChange={(value) => updateField('fatherName', value)}
-              onSearchChange={(value) => updateField('fatherSearch', value)}
-              onSelect={(dog) => selectSchoolParent('father', dog)}
+              onOpenPicker={() => setParentPicker('father')}
             />
             <TextField label="Cor da mãe" value={form.motherColor} onChange={(value) => updateField('motherColor', value)} />
             <TextField label="Cor do pai" value={form.fatherColor} onChange={(value) => updateField('fatherColor', value)} />
@@ -228,6 +231,18 @@ export default function NewDogPage() {
           </div>
         </div>
       </form>
+
+      {parentPicker && (
+        <ParentPickerModal
+          label={parentPicker === 'mother' ? 'mãe' : 'pai'}
+          search={pickerSearch}
+          dogs={pickerDogs}
+          selectedRga={parentPicker === 'mother' ? form.motherSchoolRga : form.fatherSchoolRga}
+          onSearchChange={(value) => updateField(parentPicker === 'mother' ? 'motherSearch' : 'fatherSearch', value)}
+          onSelect={(dog) => selectSchoolParent(parentPicker, dog)}
+          onClose={() => setParentPicker(null)}
+        />
+      )}
     </section>
   );
 }
@@ -285,45 +300,88 @@ function SelectField({ label, value, onChange, options, required = false }) {
   );
 }
 
-function ParentField({ label, origin, name, search, selectedRga, schoolDogs, onOriginChange, onNameChange, onSearchChange, onSelect }) {
+function ToggleField({ label, checked, onChange }) {
+  return (
+    <label className="toggle-field">
+      <span>{label}</span>
+      <button className={checked ? 'selected' : ''} type="button" onClick={() => onChange(!checked)}>
+        {checked ? 'Sim' : 'Não'}
+      </button>
+    </label>
+  );
+}
+
+function ParentField({ label, origin, name, selectedDog, selectedRga, onOriginChange, onNameChange, onOpenPicker }) {
   const isSchool = origin === 'Escola';
+  const lowerLabel = label.toLowerCase();
+  const article = label === 'Pai' ? 'do' : 'da';
 
   return (
     <div className="parent-field">
       <SelectField
-        label={`Procedência da ${label.toLowerCase()}`}
+        label={`Procedência ${article} ${lowerLabel}`}
         value={origin}
         onChange={onOriginChange}
         options={['', 'Escola', 'Canil externo', 'Outro / descritivo']}
       />
 
       {isSchool ? (
-        <div className="parent-search">
-          <label className="data-field">
-            <span>Pesquisar {label.toLowerCase()} na escola</span>
-            <div className="search-input-shell">
-              <Search size={16} />
-              <input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder={`Nome ou RGA da ${label.toLowerCase()}`} />
-            </div>
-          </label>
-          <div className="parent-results" role="list">
-            {schoolDogs.map((dog) => (
-              <button
-                className={selectedRga === dog.rga ? 'selected' : ''}
-                key={dog.rga}
-                type="button"
-                onClick={() => onSelect(dog)}
-              >
-                <strong>{dog.name}</strong>
-                <span>{dog.rga} · {dog.breed} · {dog.coat}</span>
-              </button>
-            ))}
-            {schoolDogs.length === 0 && <p>Nenhum cão de reprodução encontrado com esse filtro.</p>}
-          </div>
+        <div className="parent-selector">
+          <span>{selectedRga ? 'Reprodutor selecionado' : 'Nenhum reprodutor selecionado'}</span>
+          {selectedDog ? (
+            <strong>{selectedDog.name} · {selectedDog.rga}</strong>
+          ) : (
+            <p>Selecione um cão marcado como reprodutor no cadastro da escola.</p>
+          )}
+          <button className="ghost-action" type="button" onClick={onOpenPicker}>
+            <Search size={16} /> Selecionar {lowerLabel}
+          </button>
         </div>
       ) : (
-        <TextField label={`Nome da ${label.toLowerCase()}`} value={name} onChange={onNameChange} placeholder="Nome ou descrição da procedência" />
+        <TextField label={`Nome ${article} ${lowerLabel}`} value={name} onChange={onNameChange} placeholder="Nome ou descrição da procedência" />
       )}
+    </div>
+  );
+}
+
+function ParentPickerModal({ label, search, dogs, selectedRga, onSearchChange, onSelect, onClose }) {
+  return (
+    <div className="modal-backdrop" role="presentation">
+      <section className="parent-modal" role="dialog" aria-modal="true" aria-labelledby="parent-modal-title">
+        <header>
+          <div>
+            <p className="eyebrow">Cães de reprodução</p>
+            <h3 id="parent-modal-title">Selecionar {label}</h3>
+          </div>
+          <button className="icon-action" type="button" aria-label="Fechar modal" onClick={onClose}>
+            <X size={18} />
+          </button>
+        </header>
+
+        <label className="data-field">
+          <span>Pesquisar por nome, RGA, raça ou pelagem</span>
+          <div className="search-input-shell">
+            <Search size={16} />
+            <input autoFocus value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder={`Buscar ${label} reprodutor`} />
+          </div>
+        </label>
+
+        <div className="parent-modal-list" role="list">
+          {dogs.map((dog) => (
+            <button
+              className={selectedRga === dog.rga ? 'selected' : ''}
+              key={dog.rga}
+              type="button"
+              onClick={() => onSelect(dog)}
+            >
+              <strong>{dog.name}</strong>
+              <span>{dog.rga} · {dog.sex} · {dog.breed} · {dog.coat}</span>
+              <em>Reprodutor</em>
+            </button>
+          ))}
+          {dogs.length === 0 && <p>Nenhum reprodutor encontrado com esse filtro.</p>}
+        </div>
+      </section>
     </div>
   );
 }
@@ -348,6 +406,7 @@ function findSchoolBreeders(dogs, sex, query) {
 
   return dogs
     .filter((dog) => dog.sex === sex)
+    .filter((dog) => dog.isBreeder)
     .filter((dog) => {
       if (!normalizedQuery) {
         return true;

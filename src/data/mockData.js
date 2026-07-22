@@ -45,6 +45,7 @@ export const dogs = [
     chip: '985141000342881',
     alert: 'Otite bilateral',
     health: 'alert',
+    isBreeder: true,
     progress: 94
   },
   {
@@ -64,6 +65,7 @@ export const dogs = [
     chip: '',
     alert: 'Microchip pendente',
     health: 'alert',
+    isBreeder: true,
     progress: 53
   },
   {
@@ -83,6 +85,7 @@ export const dogs = [
     chip: '985141000642331',
     alert: '',
     health: 'ok',
+    isBreeder: false,
     progress: 24
   },
   {
@@ -102,6 +105,7 @@ export const dogs = [
     chip: '985141000642522',
     alert: '',
     health: 'ok',
+    isBreeder: false,
     progress: 12
   },
   {
@@ -121,6 +125,7 @@ export const dogs = [
     chip: '985141000128907',
     alert: '',
     health: 'ok',
+    isBreeder: false,
     progress: 59
   },
   {
@@ -140,6 +145,7 @@ export const dogs = [
     chip: '985141000112764',
     alert: '',
     health: 'ok',
+    isBreeder: true,
     progress: 71
   },
   {
@@ -159,6 +165,7 @@ export const dogs = [
     chip: '985141000109221',
     alert: '',
     health: 'ok',
+    isBreeder: true,
     progress: 82
   },
   {
@@ -178,6 +185,7 @@ export const dogs = [
     chip: '985141000091332',
     alert: '',
     health: 'ok',
+    isBreeder: false,
     progress: 100
   }
 ];
