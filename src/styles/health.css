@@ -19,10 +19,34 @@
   box-shadow: var(--shadow);
 }
 
+.dog-vaccine-passport.is-closed {
+  box-shadow: none;
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.section-actions > span {
+  padding: 6px 9px;
+  border-radius: 999px;
+  color: var(--blue);
+  background: #eef2ff;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
 .vaccine-summary-strip {
   display: grid;
   grid-template-columns: repeat(3, minmax(160px, 1fr));
   gap: 10px;
+}
+
+.dog-vaccine-passport.is-open .vaccine-summary-strip {
   margin-bottom: 14px;
 }
 
@@ -132,6 +156,35 @@
   background: #eef2ff;
   font-size: 0.86rem;
   font-weight: 700;
+}
+
+.medical-record-panel {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--forest);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.medical-record-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(170px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.medical-record-form .wide {
+  grid-column: 1 / -1;
+}
+
+.medical-record-upload {
+  grid-column: span 3;
+}
+
+.medical-record-submit {
+  justify-content: center;
+  min-height: 42px;
 }
 
 .vaccination-table {

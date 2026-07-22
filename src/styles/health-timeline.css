@@ -69,6 +69,11 @@
   background: #fff1e9;
 }
 
+.event-pill.green {
+  color: var(--forest);
+  background: #eef8ea;
+}
+
 .health-event time {
   color: var(--muted);
   font-size: 0.88rem;
@@ -77,4 +82,9 @@
 .health-event p {
   margin: 0;
   color: var(--muted);
+}
+
+.health-event small {
+  color: var(--blue);
+  font-weight: 700;
 }

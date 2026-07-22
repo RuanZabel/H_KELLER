@@ -42,6 +42,10 @@
     grid-template-columns: repeat(2, minmax(150px, 1fr));
   }
 
+  .medical-record-form {
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
+  }
+
   .auth-brand {
     min-height: 360px;
   }
@@ -118,7 +122,12 @@
   .vaccination-table.compact-card .vaccination-row,
   .vaccine-summary-strip,
   .event-register-grid,
+  .medical-record-form,
   .inline-fields {
     grid-template-columns: 1fr;
+  }
+
+  .medical-record-upload {
+    grid-column: 1;
   }
 }

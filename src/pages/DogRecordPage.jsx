@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import {
   AlertTriangle,
+  ChevronDown,
+  ChevronRight,
   ClipboardList,
   Dog,
   FileText,
@@ -99,6 +101,9 @@ function AnimalData({ dog }) {
 function HealthTab({ dog }) {
   const [protocolEvents, setProtocolEvents] = useState(() => buildProtocolForDog(dog));
   const [selectedEventId, setSelectedEventId] = useState(null);
+  const [isWalletOpen, setIsWalletOpen] = useState(false);
+  const [clinicalRecords, setClinicalRecords] = useState(() => buildInitialClinicalRecords(dog));
+  const [recordForm, setRecordForm] = useState(() => buildEmptyRecordForm());
   const doneCount = protocolEvents.filter((event) => event.doneDate).length;
   const nextPending = protocolEvents.find((event) => !event.doneDate);
   const selectedEvent = protocolEvents.find((event) => event.id === selectedEventId);
@@ -118,15 +123,58 @@ function HealthTab({ dog }) {
     }));
   }
 
+  function updateRecordForm(field, value) {
+    setRecordForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function addClinicalRecord(event) {
+    event.preventDefault();
+
+    if (!recordForm.title.trim()) {
+      return;
+    }
+
+    const newRecord = {
+      id: `record-${Date.now()}`,
+      type: recordForm.type,
+      date: fromInputDate(recordForm.date),
+      phase: recordForm.status,
+      title: recordForm.title.trim(),
+      desc: buildRecordDescription(recordForm),
+      color: colorForRecordType(recordForm.type),
+      attachment: recordForm.attachment
+    };
+
+    setClinicalRecords((current) => [newRecord, ...current]);
+    setRecordForm((current) => ({
+      ...buildEmptyRecordForm(),
+      type: current.type,
+      date: current.date
+    }));
+  }
+
   return (
     <div className="dog-health-stack">
-      <section className="dog-vaccine-passport">
+      <section className={`dog-vaccine-passport ${isWalletOpen ? 'is-open' : 'is-closed'}`}>
         <div className="section-title">
           <div>
             <p className="eyebrow">Protocolo gerado ao nascer</p>
             <h3>Carteira e eventos padrão de {dog.name}</h3>
           </div>
-          <span>{doneCount}/{protocolEvents.length} eventos feitos</span>
+          <div className="section-actions">
+            <span>{doneCount}/{protocolEvents.length} eventos feitos</span>
+            <button
+              className="ghost-action"
+              type="button"
+              onClick={() => {
+                setIsWalletOpen((current) => !current);
+                setSelectedEventId(null);
+              }}
+            >
+              {isWalletOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+              {isWalletOpen ? 'Fechar carteira' : 'Abrir carteira'}
+            </button>
+          </div>
         </div>
 
         <div className="vaccine-summary-strip">
@@ -135,7 +183,7 @@ function HealthTab({ dog }) {
           <article><strong>{nextPending ? nextPending.ageLabel : 'Completo'}</strong><span>Próxima idade prevista</span></article>
         </div>
 
-        {selectedEvent && (
+        {isWalletOpen && selectedEvent && (
           <section className="event-register-panel">
             <div>
               <p className="eyebrow">Cadastro do evento</p>
@@ -182,6 +230,7 @@ function HealthTab({ dog }) {
           </section>
         )}
 
+        {isWalletOpen && (
         <div className="vaccination-table compact-card">
           <div className="vaccination-row header">
             <span>Evento padrão</span>
@@ -231,6 +280,63 @@ function HealthTab({ dog }) {
             </article>
           ))}
         </div>
+        )}
+      </section>
+
+      <section className="medical-record-panel">
+        <div className="section-title">
+          <div>
+            <p className="eyebrow">Novo lançamento</p>
+            <h3>Registro de prontuário</h3>
+          </div>
+        </div>
+
+        <form className="medical-record-form" onSubmit={addClinicalRecord}>
+          <label className="data-field">
+            <span>Tipo</span>
+            <select value={recordForm.type} onChange={(event) => updateRecordForm('type', event.target.value)}>
+              <option>Medicação</option>
+              <option>Vacina</option>
+              <option>Pedido veterinário</option>
+              <option>Exame / laudo</option>
+              <option>Retorno</option>
+              <option>Observação clínica</option>
+            </select>
+          </label>
+          <label className="data-field">
+            <span>Data</span>
+            <input type="date" value={recordForm.date} onChange={(event) => updateRecordForm('date', event.target.value)} />
+          </label>
+          <label className="data-field">
+            <span>Status</span>
+            <select value={recordForm.status} onChange={(event) => updateRecordForm('status', event.target.value)}>
+              <option>Aberto</option>
+              <option>Solicitado</option>
+              <option>Realizado</option>
+              <option>Concluído</option>
+            </select>
+          </label>
+          <label className="data-field">
+            <span>Veterinário / responsável</span>
+            <input value={recordForm.veterinarian} onChange={(event) => updateRecordForm('veterinarian', event.target.value)} placeholder="Nome ou equipe" />
+          </label>
+          <label className="data-field wide">
+            <span>Título</span>
+            <input value={recordForm.title} onChange={(event) => updateRecordForm('title', event.target.value)} placeholder="Ex.: Prescrever medicação por 5 dias" required />
+          </label>
+          <label className="data-field wide">
+            <span>Descrição / pedido</span>
+            <textarea value={recordForm.request} onChange={(event) => updateRecordForm('request', event.target.value)} placeholder="Dose, frequência, exame solicitado, orientação veterinária ou observação clínica." />
+          </label>
+          <label className="upload-field medical-record-upload">
+            <FileUp size={17} />
+            <span>{recordForm.attachment || 'Anexar receita, pedido, laudo ou imagem'}</span>
+            <input type="file" accept="image/*,.pdf" onChange={(event) => updateRecordForm('attachment', event.target.files?.[0]?.name || '')} />
+          </label>
+          <button className="primary-action medical-record-submit" type="submit">
+            <Plus size={17} /> Registrar no prontuário
+          </button>
+        </form>
       </section>
 
       <div className="split-layout">
@@ -252,6 +358,15 @@ function HealthTab({ dog }) {
 
         <section className="timeline-panel">
           <h3>Eventos de saúde</h3>
+          {clinicalRecords.map((event) => (
+            <article className="health-event" key={event.id}>
+              <span className={`event-pill ${event.color}`}>{event.type}</span>
+              <time>{event.date} · {event.phase}</time>
+              <strong>{event.title}</strong>
+              <p>{event.desc}</p>
+              {event.attachment && <small>Anexo: {event.attachment}</small>}
+            </article>
+          ))}
           {dogEvents.map((event) => (
             <article className="health-event" key={event.title}>
               <span className={`event-pill ${event.color}`}>{event.type}</span>
@@ -419,6 +534,65 @@ function DocumentsTab() {
       <button className="doc-card add"><Plus size={24} /><strong>Anexar documento</strong><span>PDF, imagem ou vídeo</span></button>
     </div>
   );
+}
+
+function buildInitialClinicalRecords(dog) {
+  return [
+    {
+      id: `${dog.rga}-clinical-1`,
+      type: 'Pedido veterinário',
+      date: '12/07/2026',
+      phase: 'Solicitado',
+      title: 'Revisão de ouvido e retorno',
+      desc: dog.alert
+        ? 'Solicitado retorno para reavaliar otite, evolução do tratamento e necessidade de novo laudo.'
+        : 'Acompanhamento preventivo registrado para manter histórico clínico atualizado.',
+      color: 'amber',
+      attachment: ''
+    }
+  ];
+}
+
+function buildEmptyRecordForm() {
+  return {
+    type: 'Medicação',
+    date: new Date().toISOString().slice(0, 10),
+    status: 'Aberto',
+    veterinarian: '',
+    title: '',
+    request: '',
+    attachment: ''
+  };
+}
+
+function buildRecordDescription(record) {
+  const parts = [];
+
+  if (record.veterinarian.trim()) {
+    parts.push(`Responsável: ${record.veterinarian.trim()}.`);
+  }
+
+  if (record.request.trim()) {
+    parts.push(record.request.trim());
+  }
+
+  return parts.join(' ') || 'Registro criado no prontuário do cão.';
+}
+
+function colorForRecordType(type) {
+  if (type === 'Vacina') {
+    return 'blue';
+  }
+
+  if (type === 'Medicação') {
+    return 'orange';
+  }
+
+  if (type === 'Pedido veterinário' || type === 'Exame / laudo') {
+    return 'amber';
+  }
+
+  return 'green';
 }
 
 function buildDogDiet(dog) {
