@@ -7,7 +7,7 @@ import {
 import { NavLink, Outlet } from 'react-router-dom';
 import BackButton from '../common/BackButton.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { privateRoutes } from '../../routes/routeConfig.jsx';
+import { navigationRoutes } from '../../routes/routeConfig.jsx';
 
 export default function AppLayout() {
   const { logout, user } = useAuth();
@@ -17,7 +17,7 @@ export default function AppLayout() {
       <Header />
       <nav className="top-nav" aria-label="Navegação principal">
         <div className="nav-scroll">
-          {privateRoutes.map((item) => <NavItem key={item.path} {...item} />)}
+          {navigationRoutes.map((item) => <NavItem key={item.path} {...item} />)}
         </div>
         <div className="session-menu">
           <span>{user?.role}</span>

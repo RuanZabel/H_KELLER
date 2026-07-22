@@ -36,3 +36,5 @@ export const privateRoutes = [
   { path: '/checklists', icon: BookOpenCheck, label: 'Checklists', element: <ChecklistsPage /> },
   { path: '/config', icon: Settings, label: 'Config', element: <ConfigPage /> }
 ];
+
+export const navigationRoutes = privateRoutes.filter((route) => route.path !== '/documentos');
