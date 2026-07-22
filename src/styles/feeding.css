@@ -71,3 +71,32 @@
   font-size: 0.9rem;
 }
 
+.feeding-history-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.75fr) minmax(0, 1.25fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.feeding-history-item {
+  width: 100%;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.feeding-history-item.active {
+  border-color: var(--forest);
+  background: #f6fbf3;
+  box-shadow: inset 5px 0 0 var(--forest);
+}
+
+.feeding-history-detail .section-title > span {
+  padding: 6px 9px;
+  border-radius: 999px;
+  color: var(--forest);
+  background: #edf6e8;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+

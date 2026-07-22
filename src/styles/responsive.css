@@ -30,7 +30,8 @@
 
   .module-grid,
   .wallet-grid,
-  .auth-shell {
+  .auth-shell,
+  .feeding-history-layout {
     grid-template-columns: 1fr;
   }
 

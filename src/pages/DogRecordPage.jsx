@@ -384,6 +384,8 @@ function HealthTab({ dog }) {
 function FeedingTab({ dog }) {
   const diet = buildDogDiet(dog);
   const total = diet.amount * diet.meals;
+  const [selectedHistoryId, setSelectedHistoryId] = useState(diet.history[0]?.id);
+  const selectedHistory = diet.history.find((item) => item.id === selectedHistoryId) || diet.history[0];
 
   return (
     <div className="feeding-stack">
@@ -420,15 +422,44 @@ function FeedingTab({ dog }) {
         </aside>
       </div>
 
-      <section className="timeline-panel">
-        <h3>Histórico alimentar</h3>
-        {diet.history.map((item) => (
-          <article className="work-item" key={item.title}>
-            <Soup size={18} />
-            <div><strong>{item.title}</strong><p>{item.description}</p></div>
-            <span>{item.date}</span>
-          </article>
-        ))}
+      <section className="feeding-history-layout">
+        <div className="timeline-panel">
+          <h3>Histórico alimentar</h3>
+          {diet.history.map((item) => (
+            <button
+              className={`work-item feeding-history-item ${selectedHistory?.id === item.id ? 'active' : ''}`}
+              key={item.id}
+              type="button"
+              onClick={() => setSelectedHistoryId(item.id)}
+            >
+              <Soup size={18} />
+              <div><strong>{item.title}</strong><p>{item.description}</p></div>
+              <span>{item.date}</span>
+            </button>
+          ))}
+        </div>
+
+        {selectedHistory && (
+          <aside className="feeding-panel feeding-history-detail">
+            <div className="section-title">
+              <div>
+                <p className="eyebrow">Detalhe do histórico</p>
+                <h3>{selectedHistory.title}</h3>
+              </div>
+              <span>{selectedHistory.date}</span>
+            </div>
+            <div className="content-grid">
+              <label className="data-field"><span>Dieta</span><input value={selectedHistory.food} readOnly /></label>
+              <label className="data-field"><span>Quantidade</span><input value={selectedHistory.amount} readOnly /></label>
+              <label className="data-field"><span>Frequência</span><input value={selectedHistory.meals} readOnly /></label>
+              <label className="data-field"><span>Horários</span><input value={selectedHistory.times} readOnly /></label>
+              <label className="data-field"><span>Responsável</span><input value={selectedHistory.responsible} readOnly /></label>
+              <label className="data-field"><span>Status</span><input value={selectedHistory.status} readOnly /></label>
+              <label className="data-field wide"><span>Justificativa / evolução</span><textarea value={selectedHistory.details} readOnly /></label>
+              <label className="data-field wide"><span>Observações</span><textarea value={selectedHistory.notes} readOnly /></label>
+            </div>
+          </aside>
+        )}
       </section>
     </div>
   );
@@ -611,9 +642,48 @@ function buildDogDiet(dog) {
     review: dog.phase <= 4 ? 'Em 7 dias' : 'Em 30 dias',
     responsible: 'Equipe de manejo',
     history: [
-      { title: 'Dieta atualizada', description: `${dog.name} iniciou dieta ${dog.phase <= 4 ? 'starter' : 'super premium'} com quantidade diária calculada.`, date: '01/07/2026' },
-      { title: 'Peso conferido', description: 'Quantidade mantida após revisão de peso e escore corporal.', date: '25/06/2026' },
-      { title: 'Receituário anterior encerrado', description: 'Histórico preservado na timeline do prontuário.', date: '10/06/2026' }
+      {
+        id: 'diet-current',
+        title: 'Dieta atualizada',
+        description: `${dog.name} iniciou dieta ${dog.phase <= 4 ? 'starter' : 'super premium'} com quantidade diária calculada.`,
+        date: '01/07/2026',
+        food: dog.phase <= 4 ? 'Starter canil · filhote' : 'Super premium raças grandes',
+        amount: `${baseAmount}g por refeição · ${baseAmount * (dog.phase <= 4 ? 4 : 3)}g/dia`,
+        meals: dog.phase <= 4 ? '4 refeições ao dia' : '3 refeições ao dia',
+        times: dog.phase <= 4 ? '07h, 11h, 15h, 19h' : '07h, 12h, 18h',
+        responsible: 'Equipe de manejo',
+        status: 'Ativa',
+        details: 'Ajuste feito conforme fase de desenvolvimento, rotina de treino e escore corporal atual.',
+        notes: dog.alert ? 'Monitorar aceitação alimentar durante tratamento e evitar petiscos fora do plano.' : 'Manter água livre e registrar qualquer alteração de apetite.'
+      },
+      {
+        id: 'weight-review',
+        title: 'Peso conferido',
+        description: 'Quantidade mantida após revisão de peso e escore corporal.',
+        date: '25/06/2026',
+        food: dog.phase <= 4 ? 'Starter canil · filhote' : 'Super premium raças grandes',
+        amount: `${baseAmount}g por refeição`,
+        meals: dog.phase <= 4 ? '4 refeições ao dia' : '3 refeições ao dia',
+        times: dog.phase <= 4 ? '07h, 11h, 15h, 19h' : '07h, 12h, 18h',
+        responsible: 'Responsável técnico',
+        status: 'Conferida',
+        details: 'Peso e escore corporal revisados sem necessidade de troca de dieta neste ciclo.',
+        notes: 'Próxima conferência alimentar deve ocorrer junto da revisão clínica ou mudança de fase.'
+      },
+      {
+        id: 'previous-prescription',
+        title: 'Receituário anterior encerrado',
+        description: 'Histórico preservado na timeline do prontuário.',
+        date: '10/06/2026',
+        food: 'Plano alimentar anterior',
+        amount: 'Quantidade anterior encerrada',
+        meals: 'Rotina anterior',
+        times: 'Conforme prescrição anterior',
+        responsible: 'Equipe de manejo',
+        status: 'Encerrada',
+        details: 'Receituário alimentar substituído por nova prescrição para preservar rastreabilidade do prontuário.',
+        notes: 'Registro mantido apenas para consulta histórica.'
+      }
     ]
   };
 }
