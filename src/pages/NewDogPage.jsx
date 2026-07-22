@@ -1,4 +1,4 @@
-import { AlertTriangle, Check, Dog, Save } from 'lucide-react';
+import { AlertTriangle, Check, Dog, Save, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PageHeader from '../components/common/PageHeader.jsx';
@@ -17,9 +17,14 @@ const initialForm = {
   pedigree: '',
   breed: '',
   coat: '',
+  motherOrigin: '',
   motherName: '',
+  motherSchoolRga: '',
+  motherSearch: '',
+  fatherOrigin: '',
   fatherName: '',
-  parentsOrigin: '',
+  fatherSchoolRga: '',
+  fatherSearch: '',
   fatherColor: '',
   motherColor: '',
   temperament: '',
@@ -55,10 +60,39 @@ export default function NewDogPage() {
 
   const missingFields = requiredFields.filter((field) => !form[field]);
   const canSave = missingFields.length === 0;
+  const schoolMothers = useMemo(() => findSchoolBreeders(dogs, 'Fêmea', form.motherSearch), [dogs, form.motherSearch]);
+  const schoolFathers = useMemo(() => findSchoolBreeders(dogs, 'Macho', form.fatherSearch), [dogs, form.fatherSearch]);
+  const selectedMother = dogs.find((dog) => dog.rga === form.motherSchoolRga);
+  const selectedFather = dogs.find((dog) => dog.rga === form.fatherSchoolRga);
 
   function updateField(field, value) {
     setSubmitted(false);
-    setForm((current) => ({ ...current, [field]: value }));
+    setForm((current) => {
+      const next = { ...current, [field]: value };
+
+      if (field === 'motherOrigin' && value !== 'Escola') {
+        next.motherSchoolRga = '';
+        next.motherSearch = '';
+      }
+
+      if (field === 'fatherOrigin' && value !== 'Escola') {
+        next.fatherSchoolRga = '';
+        next.fatherSearch = '';
+      }
+
+      return next;
+    });
+  }
+
+  function selectSchoolParent(parent, parentDog) {
+    setSubmitted(false);
+    setForm((current) => ({
+      ...current,
+      [`${parent}SchoolRga`]: parentDog.rga,
+      [`${parent}Name`]: parentDog.name,
+      [`${parent}Search`]: parentDog.name,
+      [`${parent}Color`]: parentDog.coat || ''
+    }));
   }
 
   function handleSubmit(event) {
@@ -81,8 +115,12 @@ export default function NewDogPage() {
       trainer: 'A definir',
       socializer: 'A definir',
       birth: fromInputDate(form.birthDate),
-      mother: form.motherName || 'A definir',
-      father: form.fatherName || 'A definir',
+      mother: selectedMother?.name || form.motherName || 'A definir',
+      father: selectedFather?.name || form.fatherName || 'A definir',
+      parentRelations: {
+        mother: buildParentRelation('Mãe', form.motherOrigin, selectedMother, form.motherName),
+        father: buildParentRelation('Pai', form.fatherOrigin, selectedFather, form.fatherName)
+      },
       chip: form.microchip,
       alert: form.microchip ? '' : 'Microchip pendente',
       health: form.microchip ? 'ok' : 'alert',
@@ -141,9 +179,30 @@ export default function NewDogPage() {
           </FormSection>
 
           <FormSection title="Filiação" description="Histórico pré-nascimento, com vínculo interno ou cadastro manual do canil.">
-            <TextField label="Nome da mãe" value={form.motherName} onChange={(value) => updateField('motherName', value)} />
-            <TextField label="Nome do pai" value={form.fatherName} onChange={(value) => updateField('fatherName', value)} />
-            <SelectField label="Procedência dos pais" value={form.parentsOrigin} onChange={(value) => updateField('parentsOrigin', value)} options={['', 'Escola', 'Canil externo']} />
+            <ParentField
+              label="Mãe"
+              origin={form.motherOrigin}
+              name={form.motherName}
+              search={form.motherSearch}
+              selectedRga={form.motherSchoolRga}
+              schoolDogs={schoolMothers}
+              onOriginChange={(value) => updateField('motherOrigin', value)}
+              onNameChange={(value) => updateField('motherName', value)}
+              onSearchChange={(value) => updateField('motherSearch', value)}
+              onSelect={(dog) => selectSchoolParent('mother', dog)}
+            />
+            <ParentField
+              label="Pai"
+              origin={form.fatherOrigin}
+              name={form.fatherName}
+              search={form.fatherSearch}
+              selectedRga={form.fatherSchoolRga}
+              schoolDogs={schoolFathers}
+              onOriginChange={(value) => updateField('fatherOrigin', value)}
+              onNameChange={(value) => updateField('fatherName', value)}
+              onSearchChange={(value) => updateField('fatherSearch', value)}
+              onSelect={(dog) => selectSchoolParent('father', dog)}
+            />
             <TextField label="Cor da mãe" value={form.motherColor} onChange={(value) => updateField('motherColor', value)} />
             <TextField label="Cor do pai" value={form.fatherColor} onChange={(value) => updateField('fatherColor', value)} />
             <NumberField label="Número de ninhadas" value={form.litterCount} onChange={(value) => updateField('litterCount', value)} />
@@ -226,6 +285,49 @@ function SelectField({ label, value, onChange, options, required = false }) {
   );
 }
 
+function ParentField({ label, origin, name, search, selectedRga, schoolDogs, onOriginChange, onNameChange, onSearchChange, onSelect }) {
+  const isSchool = origin === 'Escola';
+
+  return (
+    <div className="parent-field">
+      <SelectField
+        label={`Procedência da ${label.toLowerCase()}`}
+        value={origin}
+        onChange={onOriginChange}
+        options={['', 'Escola', 'Canil externo', 'Outro / descritivo']}
+      />
+
+      {isSchool ? (
+        <div className="parent-search">
+          <label className="data-field">
+            <span>Pesquisar {label.toLowerCase()} na escola</span>
+            <div className="search-input-shell">
+              <Search size={16} />
+              <input value={search} onChange={(event) => onSearchChange(event.target.value)} placeholder={`Nome ou RGA da ${label.toLowerCase()}`} />
+            </div>
+          </label>
+          <div className="parent-results" role="list">
+            {schoolDogs.map((dog) => (
+              <button
+                className={selectedRga === dog.rga ? 'selected' : ''}
+                key={dog.rga}
+                type="button"
+                onClick={() => onSelect(dog)}
+              >
+                <strong>{dog.name}</strong>
+                <span>{dog.rga} · {dog.breed} · {dog.coat}</span>
+              </button>
+            ))}
+            {schoolDogs.length === 0 && <p>Nenhum cão de reprodução encontrado com esse filtro.</p>}
+          </div>
+        </div>
+      ) : (
+        <TextField label={`Nome da ${label.toLowerCase()}`} value={name} onChange={onNameChange} placeholder="Nome ou descrição da procedência" />
+      )}
+    </div>
+  );
+}
+
 function TextArea({ label, value, onChange, wide = false }) {
   return (
     <label className={`data-field ${wide ? 'wide' : ''}`}>
@@ -239,6 +341,38 @@ function generateRga(dogs) {
   const year = new Date().getFullYear();
   const nextNumber = dogs.length + 1;
   return `HK-${year}-${String(nextNumber).padStart(4, '0')}`;
+}
+
+function findSchoolBreeders(dogs, sex, query) {
+  const normalizedQuery = normalizeSearch(query);
+
+  return dogs
+    .filter((dog) => dog.sex === sex)
+    .filter((dog) => {
+      if (!normalizedQuery) {
+        return true;
+      }
+
+      return normalizeSearch(`${dog.name} ${dog.rga} ${dog.breed} ${dog.coat}`).includes(normalizedQuery);
+    })
+    .slice(0, 6);
+}
+
+function buildParentRelation(role, origin, selectedDog, typedName) {
+  return {
+    role,
+    origin: origin || 'Não informado',
+    rga: origin === 'Escola' ? selectedDog?.rga || '' : '',
+    name: selectedDog?.name || typedName || '',
+    linked: origin === 'Escola' && Boolean(selectedDog?.rga)
+  };
+}
+
+function normalizeSearch(value) {
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
 }
 
 function fromInputDate(value) {

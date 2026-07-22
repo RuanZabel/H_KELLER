@@ -7,7 +7,25 @@ export function DogProvider({ children }) {
   const [dogs, setDogs] = useState(initialDogs);
 
   function addDog(dog) {
-    setDogs((current) => [dog, ...current]);
+    setDogs((current) => {
+      const parentRgas = [
+        dog.parentRelations?.mother?.rga,
+        dog.parentRelations?.father?.rga
+      ].filter(Boolean);
+
+      const linkedParents = current.map((currentDog) => {
+        if (!parentRgas.includes(currentDog.rga)) {
+          return currentDog;
+        }
+
+        return {
+          ...currentDog,
+          children: Array.from(new Set([...(currentDog.children || []), dog.rga]))
+        };
+      });
+
+      return [dog, ...linkedParents];
+    });
     return dog;
   }
 
