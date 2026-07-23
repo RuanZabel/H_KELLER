@@ -55,6 +55,49 @@
   gap: 10px;
 }
 
+.config-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.config-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.breed-form {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.config-message {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.breed-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.breed-list span {
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--forest);
+  background: #edf6e8;
+  font-weight: 700;
+}
+
 .event-types button {
   justify-content: space-between;
   gap: 10px;

@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PageHeader from '../components/common/PageHeader.jsx';
 import { phases } from '../data/mockData.js';
+import { useConfig } from '../context/ConfigContext.jsx';
 import { useDogs } from '../context/DogContext.jsx';
 
 const initialForm = {
@@ -50,6 +51,7 @@ const fieldLabels = {
 export default function NewDogPage() {
   const navigate = useNavigate();
   const { addDog, dogs } = useDogs();
+  const { dogBreeds } = useConfig();
   const [form, setForm] = useState(initialForm);
   const [submitted, setSubmitted] = useState(false);
   const [parentPicker, setParentPicker] = useState(null);
@@ -177,7 +179,7 @@ export default function NewDogPage() {
 
           <FormSection title="Identificação e características" description="Dados complementares usados na carteira digital e no prontuário.">
             <TextField label="Microchip" value={form.microchip} onChange={(value) => updateField('microchip', value)} placeholder="Pode ficar pendente" />
-            <TextField label="Raça" value={form.breed} onChange={(value) => updateField('breed', value)} />
+            <SelectField label="Raça" value={form.breed} onChange={(value) => updateField('breed', value)} options={['', ...dogBreeds]} />
             <TextField label="Pelagem" value={form.coat} onChange={(value) => updateField('coat', value)} />
             <NumberField label="Peso inicial (kg)" value={form.initialWeight} onChange={(value) => updateField('initialWeight', value)} />
             <TextField label="Pedigree" value={form.pedigree} onChange={(value) => updateField('pedigree', value)} />

@@ -153,4 +153,8 @@
     grid-row: auto;
     width: fit-content;
   }
+
+  .breed-form {
+    grid-template-columns: 1fr;
+  }
 }
