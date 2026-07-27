@@ -6,7 +6,7 @@ import { phases } from '../data/mockData.js';
 const eventTypes = ['Vacinação', 'Exame / laudo', 'Vermifugação', 'Cirurgia / anestesia', 'Intercorrência', 'Avaliação clínica'];
 
 export default function ConfigPage() {
-  const { addDogBreed, dogBreeds } = useConfig();
+  const { addDogBreed, dogBreeds, toggleDogBreed } = useConfig();
   const [breedName, setBreedName] = useState('');
   const [breedMessage, setBreedMessage] = useState('');
 
@@ -43,7 +43,17 @@ export default function ConfigPage() {
             </form>
             {breedMessage && <p className="config-message">{breedMessage}</p>}
             <div className="breed-list">
-              {dogBreeds.map((breed) => <span key={breed}>{breed}</span>)}
+              {dogBreeds.map((breed) => (
+                <article className={breed.active ? 'active' : 'inactive'} key={breed.name}>
+                  <div>
+                    <strong>{breed.name}</strong>
+                    <span>{breed.active ? 'Disponível no cadastro' : 'Desativada para novos cadastros'}</span>
+                  </div>
+                  <button className="ghost-action" type="button" onClick={() => toggleDogBreed(breed.name)}>
+                    {breed.active ? 'Desativar' : 'Reativar'}
+                  </button>
+                </article>
+              ))}
             </div>
           </section>
 

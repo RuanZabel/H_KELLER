@@ -1,12 +1,31 @@
 import { createContext, useContext, useMemo, useState } from 'react';
 
-const initialDogBreeds = ['Labrador', 'Golden Retriever', 'Pastor Alemão', 'Poodle', 'Outra'];
+const initialDogBreeds = [
+  { name: 'Labrador', active: true },
+  { name: 'Golden Retriever', active: true },
+  { name: 'Pastor Alemão', active: true },
+  { name: 'Poodle', active: true },
+  { name: 'Outra', active: true }
+];
 const ConfigContext = createContext(null);
+
+function normalizeBreeds(breeds) {
+  return breeds.map((breed) => {
+    if (typeof breed === 'string') {
+      return { name: breed, active: true };
+    }
+
+    return {
+      name: breed.name,
+      active: breed.active !== false
+    };
+  }).filter((breed) => breed.name);
+}
 
 function loadBreeds() {
   try {
     const stored = localStorage.getItem('hk-dog-breeds');
-    return stored ? JSON.parse(stored) : initialDogBreeds;
+    return stored ? normalizeBreeds(JSON.parse(stored)) : initialDogBreeds;
   } catch {
     return initialDogBreeds;
   }
@@ -21,21 +40,38 @@ export function ConfigProvider({ children }) {
       return false;
     }
 
-    const alreadyExists = dogBreeds.some((breed) => breed.toLowerCase() === normalizedName.toLowerCase());
+    const alreadyExists = dogBreeds.some((breed) => breed.name.toLowerCase() === normalizedName.toLowerCase());
     if (alreadyExists) {
       return false;
     }
 
-    const nextBreeds = [...dogBreeds, normalizedName].sort((a, b) => a.localeCompare(b, 'pt-BR'));
-    setDogBreeds(nextBreeds);
-    localStorage.setItem('hk-dog-breeds', JSON.stringify(nextBreeds));
+    persistBreeds([...dogBreeds, { name: normalizedName, active: true }]);
     return true;
   }
 
+  function toggleDogBreed(name) {
+    const nextBreeds = dogBreeds.map((breed) => (
+      breed.name === name ? { ...breed, active: !breed.active } : breed
+    ));
+    persistBreeds(nextBreeds);
+  }
+
+  function persistBreeds(nextBreeds) {
+    const sortedBreeds = nextBreeds.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+    setDogBreeds(sortedBreeds);
+    localStorage.setItem('hk-dog-breeds', JSON.stringify(sortedBreeds));
+  }
+
+  const activeDogBreeds = useMemo(() => (
+    dogBreeds.filter((breed) => breed.active).map((breed) => breed.name)
+  ), [dogBreeds]);
+
   const value = useMemo(() => ({
     addDogBreed,
-    dogBreeds
-  }), [dogBreeds]);
+    activeDogBreeds,
+    dogBreeds,
+    toggleDogBreed
+  }), [activeDogBreeds, dogBreeds]);
 
   return <ConfigContext.Provider value={value}>{children}</ConfigContext.Provider>;
 }

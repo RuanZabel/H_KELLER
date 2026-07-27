@@ -157,4 +157,8 @@
   .breed-form {
     grid-template-columns: 1fr;
   }
+
+  .breed-list article {
+    grid-template-columns: 1fr;
+  }
 }
