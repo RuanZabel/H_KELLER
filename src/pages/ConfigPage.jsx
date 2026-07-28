@@ -28,6 +28,8 @@ export default function ConfigPage() {
   const [eventPosition, setEventPosition] = useState(1);
   const selectedList = eventLists.find((list) => list.id === selectedListId) || eventLists[0];
   const hasAlternativeEventList = eventLists.some((list) => list.id !== selectedList.id);
+  const activeEventLists = eventLists.filter((list) => list.active);
+  const inactiveEventLists = eventLists.filter((list) => !list.active);
 
   function handleBreedSubmit(event) {
     event.preventDefault();
@@ -83,19 +85,20 @@ export default function ConfigPage() {
               <button className="primary-action" type="submit"><Plus size={17} /> Criar lista</button>
             </form>
 
-            <div className="event-list-grid">
-              {eventLists.map((list) => (
-                <button
-                  className={`${selectedList.id === list.id ? 'selected' : ''} ${list.active ? 'active' : 'inactive'}`}
-                  key={list.id}
-                  type="button"
-                  onClick={() => setSelectedListId(list.id)}
-                >
-                  <strong>{list.name}</strong>
-                  <span>{list.events.length} eventos · {list.active ? 'Ativa' : 'Desativada'}</span>
-                </button>
-              ))}
-            </div>
+            <EventListGroup
+              title="Lista ativa"
+              lists={activeEventLists}
+              selectedListId={selectedList.id}
+              emptyText="Nenhuma lista ativa definida."
+              onSelect={setSelectedListId}
+            />
+            <EventListGroup
+              title="Listas desativadas"
+              lists={inactiveEventLists}
+              selectedListId={selectedList.id}
+              emptyText="Ainda não há listas desativadas."
+              onSelect={setSelectedListId}
+            />
           </section>
 
           <section className="config-panel">
@@ -203,5 +206,30 @@ export default function ConfigPage() {
         </section>
       </div>
     </section>
+  );
+}
+
+function EventListGroup({ title, lists, selectedListId, emptyText, onSelect }) {
+  return (
+    <div className="event-list-section">
+      <div className="event-list-section-title">
+        <strong>{title}</strong>
+        <span>{lists.length}</span>
+      </div>
+      <div className="event-list-grid">
+        {lists.map((list) => (
+          <button
+            className={`${selectedListId === list.id ? 'selected' : ''} ${list.active ? 'active' : 'inactive'}`}
+            key={list.id}
+            type="button"
+            onClick={() => onSelect(list.id)}
+          >
+            <strong>{list.name}</strong>
+            <span>{list.events.length} eventos · {list.active ? 'Ativa' : 'Desativada'}</span>
+          </button>
+        ))}
+        {lists.length === 0 && <p className="config-empty">{emptyText}</p>}
+      </div>
+    </div>
   );
 }
