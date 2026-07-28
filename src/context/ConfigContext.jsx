@@ -190,7 +190,10 @@ export function ConfigProvider({ children }) {
       }
 
       const nextEvents = [...list.events];
-      const insertIndex = Math.max(0, Math.min(Number(position) - 1 || nextEvents.length, nextEvents.length));
+      const requestedPosition = Number.parseInt(position, 10);
+      const insertIndex = Number.isFinite(requestedPosition)
+        ? Math.max(0, Math.min(requestedPosition - 1, nextEvents.length))
+        : nextEvents.length;
       nextEvents.splice(insertIndex, 0, {
         id: `event-${Date.now()}`,
         ...eventData,
