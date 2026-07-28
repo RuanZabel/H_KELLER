@@ -47,6 +47,11 @@
     grid-template-columns: repeat(2, minmax(150px, 1fr));
   }
 
+  .event-form,
+  .event-editor-list article {
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
+  }
+
   .auth-brand {
     min-height: 360px;
   }
@@ -128,6 +133,8 @@
   .vaccine-summary-strip,
   .event-register-grid,
   .medical-record-form,
+  .event-form,
+  .event-editor-list article,
   .inline-fields {
     grid-template-columns: 1fr;
   }

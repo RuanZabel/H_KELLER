@@ -51,7 +51,7 @@ const fieldLabels = {
 export default function NewDogPage() {
   const navigate = useNavigate();
   const { addDog, dogs } = useDogs();
-  const { activeDogBreeds } = useConfig();
+  const { activeDogBreeds, activeEventList } = useConfig();
   const [form, setForm] = useState(initialForm);
   const [submitted, setSubmitted] = useState(false);
   const [parentPicker, setParentPicker] = useState(null);
@@ -128,6 +128,11 @@ export default function NewDogPage() {
       parentRelations: {
         mother: buildParentRelation('Mãe', form.motherOrigin, selectedMother, form.motherName),
         father: buildParentRelation('Pai', form.fatherOrigin, selectedFather, form.fatherName)
+      },
+      eventProtocol: {
+        id: activeEventList.id,
+        name: activeEventList.name,
+        events: activeEventList.events.map((event) => ({ ...event }))
       },
       chip: form.microchip,
       alert: form.microchip ? '' : 'Microchip pendente',

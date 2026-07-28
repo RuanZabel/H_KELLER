@@ -70,6 +70,40 @@
   box-shadow: var(--shadow);
 }
 
+.event-list-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.event-list-grid button {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: #fff;
+  text-align: left;
+}
+
+.event-list-grid button.selected {
+  border-color: var(--forest);
+  box-shadow: inset 5px 0 0 var(--forest);
+}
+
+.event-list-grid button.active {
+  background: #f1f8ee;
+}
+
+.event-list-grid strong {
+  color: var(--forest);
+}
+
+.event-list-grid span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .breed-form {
   display: grid;
   grid-template-columns: minmax(180px, 1fr) auto;
@@ -214,4 +248,79 @@
 
 .phase-timeline p {
   margin: 4px 0 0;
+}
+
+.event-editor-panel {
+  align-content: start;
+}
+
+.event-editor-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.event-editor-header h3,
+.event-editor-header span {
+  margin: 0;
+}
+
+.event-editor-header span {
+  display: block;
+  color: var(--muted);
+}
+
+.event-editor-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.event-form {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.7fr) minmax(180px, 1.2fr) minmax(160px, 1fr) repeat(3, minmax(105px, 0.6fr)) minmax(110px, 0.55fr) auto;
+  gap: 10px;
+  align-items: end;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfa;
+}
+
+.event-form-submit {
+  justify-content: center;
+  min-height: 42px;
+}
+
+.event-required button {
+  min-width: 86px;
+}
+
+.event-editor-list {
+  display: grid;
+  gap: 8px;
+}
+
+.event-editor-list article {
+  display: grid;
+  grid-template-columns: 42px minmax(130px, 0.7fr) minmax(180px, 1fr) minmax(150px, 0.85fr) 100px 42px;
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.event-order {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--forest);
+  font-weight: 700;
 }

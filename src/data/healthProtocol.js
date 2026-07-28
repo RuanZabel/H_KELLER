@@ -20,7 +20,9 @@ export const standardHealthProtocol = [
 ];
 
 export function buildProtocolForDog(dog) {
-  return standardHealthProtocol.map((item) => {
+  const protocol = dog.eventProtocol?.events || standardHealthProtocol;
+
+  return protocol.map((item) => {
     const done = dog.phase >= item.phase;
     return {
       ...item,
