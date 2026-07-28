@@ -52,6 +52,14 @@
     grid-template-columns: repeat(2, minmax(150px, 1fr));
   }
 
+  .event-editor-header {
+    flex-direction: column;
+  }
+
+  .event-editor-actions {
+    justify-content: flex-start;
+  }
+
   .auth-brand {
     min-height: 360px;
   }
@@ -165,7 +173,26 @@
     grid-template-columns: 1fr;
   }
 
-  .breed-list article {
+  .breed-list article,
+  .event-list-grid button {
     grid-template-columns: 1fr;
+  }
+
+  .event-editor-actions,
+  .event-editor-actions button,
+  .event-form-submit {
+    width: 100%;
+  }
+
+  .event-editor-actions {
+    flex-direction: column;
+  }
+
+  .event-form-submit {
+    grid-column: 1;
+  }
+
+  .event-order {
+    justify-self: start;
   }
 }
