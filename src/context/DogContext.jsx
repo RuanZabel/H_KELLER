@@ -1,10 +1,11 @@
 import { createContext, useContext, useMemo, useState } from 'react';
 import { dogs as initialDogs } from '../data/mockData.js';
+import { enrichDogs } from '../data/dashboardData.js';
 
 const DogContext = createContext(null);
 
 export function DogProvider({ children }) {
-  const [dogs, setDogs] = useState(initialDogs);
+  const [dogs, setDogs] = useState(() => enrichDogs(initialDogs));
 
   function addDog(dog) {
     setDogs((current) => {
