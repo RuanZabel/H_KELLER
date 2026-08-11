@@ -230,7 +230,12 @@ tbody tr:hover,
 .queue-next_7_days { border-top: 3px solid #7f8da3; }
 .queue-next_15_days { border-top: 3px solid #9b937d; }
 
-.lifecycle-board { grid-template-columns: repeat(7, minmax(270px, 1fr)); align-items: stretch; }
+.lifecycle-board {
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(270px, 1fr);
+  align-items: stretch;
+}
 .lifecycle-board .lane { min-width: 270px; min-height: 440px; border-top-width: 4px; box-shadow: none; background: #f9faf8; }
 .lifecycle-board .lane.is-drop-target { background: #eef5ee; border-color: #66866f; box-shadow: inset 0 0 0 2px #66866f; }
 .lifecycle-board .lane-header > strong { font-size: 1.08rem; }
