@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import {
   AlertTriangle, CalendarDays, CheckCircle2, ChevronDown, ChevronRight, ChevronUp,
   CircleAlert, ClipboardList, Clock3, Dog, FileText, HeartPulse, MoreVertical,
-  Paperclip, PawPrint, Pill, Plus, Search, Share2, Soup, Syringe, UserRound, Worm, X
+  Paperclip, PawPrint, Pill, Plus, Search, Soup, Syringe, UserRound, Worm, X
 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { phases } from '../../data/mockData.js';
@@ -25,7 +25,7 @@ export default function DogCareRecordPage({ dog, group }) {
         <div className="care-record-identity"><span>{dog.rga}</span><h2>{dog.name}</h2><p>{dog.sex} <b>·</b> {dog.breed} <b>·</b> Fase {dog.phase}: {phases[dog.phase - 1] || 'Acompanhamento'}</p></div>
         {(dog.alert || dog.workItems?.length) && <span className="care-record-alert"><CircleAlert size={18} /> {dog.workItems?.filter((item) => item.isOverdue || item.severity === 'critical').length || 2} pendências de saúde</span>}
       </div>
-      <div className="care-record-actions"><button><Share2 size={17} /> Compartilhar carteira <ChevronDown size={15} /></button><button className="primary-action" onClick={() => setRegistration({ type: 'medicine', name: 'Medicamento', status: 'Novo registro', date: '' })}><Plus size={18} /> Registrar evento</button></div>
+      <div className="care-record-actions"><button className="primary-action" onClick={() => setRegistration({ type: 'medicine', name: 'Medicamento', status: 'Novo registro', date: '' })}><Plus size={18} /> Registrar evento</button></div>
     </div>
     <div className="care-record-tabs" role="tablist">{tabs.map(([id, label, Icon]) => <button role="tab" aria-selected={activeTab === id} key={id} className={activeTab === id ? 'active' : ''} onClick={() => setActiveTab(id)}><Icon size={18} /> {label}</button>)}</div>
     {activeTab === 'saude' && <HealthCare dog={dog} onRegister={setRegistration} />}
