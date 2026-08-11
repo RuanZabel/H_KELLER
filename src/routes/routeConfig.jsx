@@ -1,6 +1,5 @@
 import {
   Activity,
-  BookOpenCheck,
   ClipboardCheck,
   Dog,
   FileText,
@@ -9,7 +8,6 @@ import {
   Soup,
   UserRound
 } from 'lucide-react';
-import ChecklistsPage from '../pages/ChecklistsPage.jsx';
 import ConfigPage from '../pages/ConfigPage.jsx';
 import DashboardPage from '../pages/DashboardPage.jsx';
 import DogsPage from '../pages/DogsPage.jsx';
@@ -27,7 +25,6 @@ export const privateRoutes = [
   { path: '/avaliacoes', icon: ClipboardCheck, label: 'Avaliações', element: <EvaluationsPage /> },
   { path: '/tutores', icon: UserRound, label: 'Tutores', element: <TutorsPage /> },
   { path: '/documentos', icon: FileText, label: 'Documentos', element: <DocumentsPage /> },
-  { path: '/checklists', icon: BookOpenCheck, label: 'Checklists', element: <ChecklistsPage /> },
   { path: '/config', icon: Settings, label: 'Config', element: <ConfigPage /> }
 ];
 

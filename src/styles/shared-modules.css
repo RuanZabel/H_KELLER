@@ -92,11 +92,6 @@
   font-weight: 700;
 }
 
-.checklist-row {
-  margin-top: 0;
-  box-shadow: var(--shadow);
-}
-
 .phase-timeline.full {
   max-width: 980px;
 }
