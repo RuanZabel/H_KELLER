@@ -1,4 +1,4 @@
-import { Filter, Search, X } from 'lucide-react';
+import { ArrowRight, CircleAlert, Filter, Search, X } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DogDetailsModal from '../components/dashboard/DogDetailsModal.jsx';
@@ -18,6 +18,7 @@ export default function DashboardPage() {
   const [draggedDog, setDraggedDog] = useState(null);
   const [dropTarget, setDropTarget] = useState(null);
   const [movementMessage, setMovementMessage] = useState('');
+  const [pendingMove, setPendingMove] = useState(null);
   const workItems = useMemo(() => buildWorkQueue(dogs), [dogs]);
   const boardGroups = useMemo(() => lifecycleCycles.filter((cycle) => cycle.active && cycle.usedInKanban).map((cycle, index) => {
     const existing = LIFECYCLE_GROUPS.find((group) => group.id === cycle.id);
@@ -43,8 +44,16 @@ export default function DashboardPage() {
       setMovementMessage(`${dog.name} não foi movido: conclua ${pendingCriteria.length} ${pendingCriteria.length === 1 ? 'critério pendente' : 'critérios pendentes'} da fase atual.`);
       return;
     }
+    const currentGroup = boardGroups.find((group) => group.id === dog.group);
+    setPendingMove({ dog, targetGroup, currentGroup });
+  }
+
+  function confirmMove() {
+    if (!pendingMove) return;
+    const { dog, targetGroup } = pendingMove;
     moveDogToGroup(dog.rga, targetGroup.id, targetGroup.firstPhase, targetGroup.title, targetGroup.color);
     setMovementMessage(`${dog.name} foi movido para ${targetGroup.title}.`);
+    setPendingMove(null);
   }
 
   return (
@@ -105,6 +114,16 @@ export default function DashboardPage() {
         })}
       </div>
       {selection && <DogDetailsModal {...selection} onClose={closeModal} />}
+      {pendingMove && <div className="kanban-confirm-backdrop" onMouseDown={(event) => event.target === event.currentTarget && setPendingMove(null)}>
+        <section className="kanban-confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="move-confirm-title" aria-describedby="move-confirm-description">
+          <button className="kanban-confirm-close" onClick={() => setPendingMove(null)} aria-label="Fechar"><X size={20} /></button>
+          <div className="kanban-confirm-icon"><CircleAlert size={27} /></div>
+          <div><p className="eyebrow">Alteração no ciclo de vida</p><h2 id="move-confirm-title">Confirmar mudança de fase?</h2><p id="move-confirm-description">Você realmente deseja mover <strong>{pendingMove.dog.name}</strong> para outra posição no Kanban?</p></div>
+          <div className="kanban-move-route"><span>{pendingMove.currentGroup?.title || 'Fase atual'}</span><ArrowRight size={19} /><strong>{pendingMove.targetGroup.title}</strong></div>
+          <aside><CircleAlert size={17} /> Esta alteração atualizará a fase atual do cão no sistema.</aside>
+          <footer><button onClick={() => setPendingMove(null)}>Cancelar</button><button className="primary-action" onClick={confirmMove}>Confirmar alteração</button></footer>
+        </section>
+      </div>}
     </section>
   );
 }

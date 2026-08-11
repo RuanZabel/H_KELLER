@@ -307,3 +307,19 @@ button:focus-visible, .dog-modal:focus-visible { outline: 3px solid #3d69b1; out
   .record-link { grid-column: 1 / -1; }
   .modality-options { grid-template-columns: 1fr; }
 }
+
+.kanban-confirm-backdrop { position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; padding: 20px; background: rgba(18, 28, 21, .64); }
+.kanban-confirm-dialog { position: relative; display: grid; grid-template-columns: auto 1fr; gap: 16px; width: min(520px, 96vw); padding: 24px; border: 1px solid var(--line); border-radius: 12px; background: #fff; box-shadow: 0 24px 70px rgba(10, 28, 16, .3); }
+.kanban-confirm-close { position: absolute; top: 14px; right: 14px; display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 6px; background: transparent; }
+.kanban-confirm-icon { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; color: #9b6500; background: #fff4d9; }
+.kanban-confirm-dialog h2 { margin: 3px 36px 7px 0; color: var(--forest); font-size: 1.35rem; }
+.kanban-confirm-dialog p { margin: 0; color: #526058; line-height: 1.5; }
+.kanban-confirm-dialog .eyebrow { color: #7a857d; font-size: .7rem; }
+.kanban-move-route { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 8px; color: #526058; background: #f7faf6; text-align: center; }
+.kanban-move-route svg, .kanban-move-route strong { color: var(--forest); }
+.kanban-confirm-dialog aside { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; color: #6c5930; font-size: .8rem; }
+.kanban-confirm-dialog aside svg { flex: 0 0 auto; color: #b67b08; }
+.kanban-confirm-dialog footer { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 10px; padding-top: 4px; }
+.kanban-confirm-dialog footer button { min-height: 42px; padding: 0 16px; border: 1px solid var(--line); border-radius: 7px; background: #fff; font-weight: 700; }
+.kanban-confirm-dialog footer .primary-action { border-color: var(--forest); color: #fff; background: var(--forest); }
+@media (max-width: 520px) { .kanban-confirm-dialog { grid-template-columns: 1fr; }.kanban-confirm-icon { width: 46px; height: 46px; }.kanban-confirm-dialog footer { flex-direction: column-reverse; }.kanban-confirm-dialog footer button { width: 100%; } }
