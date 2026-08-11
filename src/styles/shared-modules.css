@@ -101,44 +101,6 @@
   max-width: 980px;
 }
 
-.wallet-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(280px, 1fr));
-  gap: 16px;
-}
-
-.wallet-card {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 16px;
-  align-items: center;
-  padding: 18px;
-  border: 1px solid var(--line);
-  border-left: 5px solid var(--blue);
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: var(--shadow);
-}
-
-.wallet-card h3,
-.wallet-card p {
-  margin: 0 0 5px;
-}
-
-.qr-box {
-  display: grid;
-  place-items: center;
-  gap: 6px;
-  min-width: 96px;
-  min-height: 96px;
-  border: 1px dashed var(--blue);
-  border-radius: 8px;
-  color: var(--blue);
-  background: #f3f5ff;
-  font-size: 0.82rem;
-  font-weight: 700;
-}
-
 .empty-state {
   display: grid;
   place-items: center;
