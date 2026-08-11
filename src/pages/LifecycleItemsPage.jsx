@@ -4,10 +4,21 @@ import { createPortal } from 'react-dom';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useConfig } from '../context/ConfigContext.jsx';
 
-const types = ['Data', 'Vínculo', 'Formulário', 'Avaliação', 'Documento', 'Evidência', 'Registro'];
+const types = ['Vacina', 'Vermífugo', 'Exame', 'Medicamento', 'Outro'];
+
+function inferType(name = '', savedType = '') {
+  if (types.includes(savedType)) return savedType;
+  const normalizedName = name.toLowerCase();
+  if (/vacina|v8|v10|antirráb/.test(normalizedName)) return 'Vacina';
+  if (/vermíf|vermi|parasita/.test(normalizedName)) return 'Vermífugo';
+  if (/exame|hemograma|radiografia|avaliação clínica/.test(normalizedName)) return 'Exame';
+  if (/medicamento|remédio|suplemento/.test(normalizedName)) return 'Medicamento';
+  return 'Outro';
+}
+
 const normalize = (item, index, cycle) => typeof item === 'object'
-  ? { active: true, required: true, timing: 'Durante a fase', responsible: cycle.responsible, type: 'Registro', ...item }
-  : { id: `item-${cycle.id}-${index}`, name: item, type: index === 0 ? 'Data' : 'Registro', required: true, timing: 'Durante a fase', responsible: cycle.responsible, active: true };
+  ? { active: true, required: true, timing: 'Durante a fase', responsible: cycle.responsible, ...item, type: inferType(item.name, item.type) }
+  : { id: `item-${cycle.id}-${index}`, name: item, type: inferType(item), required: true, timing: 'Durante a fase', responsible: cycle.responsible, active: true };
 
 export default function LifecycleItemsPage() {
   const { cycleId } = useParams();
@@ -40,12 +51,57 @@ export default function LifecycleItemsPage() {
       <footer className="items-panel-footer"><span><ClipboardList size={16} /> {items.length} itens configurados · {requiredCount} obrigatórios · {items.length - requiredCount} opcionais</span></footer>
       <aside className="items-warning"><Info size={19} /> Alterar ou desativar um item pode afetar registros de cães que já estão em {cycle.name}. O histórico existente será preservado.</aside>
     </section>
-    {dialog && <ItemDialog item={dialog.item} cycle={cycle} onClose={() => setDialog(null)} onSave={save} />}
+    {dialog && <FlexibleItemDialog item={dialog.item} cycle={cycle} lifecycleCycles={lifecycleCycles} onClose={() => setDialog(null)} onSave={save} />}
   </section>;
 }
 
 function ItemDialog({ item, cycle, onClose, onSave }) {
-  const [form, setForm] = useState(item || { name: '', type: 'Registro', required: true, timing: 'Durante a fase', responsible: cycle.responsible, active: true });
+  const [form, setForm] = useState(item || { name: '', type: 'Outro', required: true, timing: 'Durante a fase', responsible: cycle.responsible, active: true });
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }));
   return createPortal(<div className="cycle-dialog-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}><form className="cycle-dialog item-dialog" onSubmit={(event) => { event.preventDefault(); onSave(form); }}><header><div><p className="eyebrow">Item do ciclo · {cycle.name}</p><h2>{item ? 'Editar item' : 'Novo item'}</h2></div><button type="button" onClick={onClose}><X /></button></header><section className="cycle-form-grid"><label className="wide"><span>Nome do item *</span><input required value={form.name} onChange={(e) => update('name', e.target.value)} placeholder="Ex.: Registro de comportamento" /></label><label><span>Tipo *</span><select value={form.type} onChange={(e) => update('type', e.target.value)}>{types.map((value) => <option key={value}>{value}</option>)}</select></label><label><span>Quando exibir ou solicitar *</span><input required value={form.timing} onChange={(e) => update('timing', e.target.value)} /></label><label className="wide"><span>Responsável *</span><input required value={form.responsible} onChange={(e) => update('responsible', e.target.value)} /></label><label className="cycle-checkbox"><input type="checkbox" checked={form.required} onChange={(e) => update('required', e.target.checked)} /> Item obrigatório</label><label className="cycle-checkbox"><input type="checkbox" checked={form.active} onChange={(e) => update('active', e.target.checked)} /> Item ativo</label></section><footer><button type="button" onClick={onClose}>Cancelar</button><button type="submit" className="primary-action">Salvar item</button></footer></form></div>, document.body);
+}
+
+function FlexibleItemDialog({ item, cycle, lifecycleCycles, onClose, onSave }) {
+  const defaultSchedule = item?.schedule || { mode: 'dog_age', ageDays: 20, delayDays: 10, referenceCycleId: '', referenceItemId: '' };
+  const [form, setForm] = useState(item || { name: '', type: 'Outro', required: true, responsible: cycle.responsible, active: true });
+  const [schedule, setSchedule] = useState(defaultSchedule);
+  const currentCycleIndex = lifecycleCycles.findIndex((entry) => entry.id === cycle.id);
+  const currentItemIndex = item ? cycle.items.findIndex((entry, index) => (typeof entry === 'object' ? entry.id : `item-${cycle.id}-${index}`) === item.id) : cycle.items.length;
+  const referenceGroups = lifecycleCycles.slice(0, currentCycleIndex + 1).map((entry, cycleIndex) => {
+    const availableItems = (entry.items || []).map((entryItem, index) => ({
+      id: typeof entryItem === 'object' ? entryItem.id : `item-${entry.id}-${index}`,
+      name: typeof entryItem === 'object' ? entryItem.name : entryItem
+    })).filter((entryItem, index) => cycleIndex < currentCycleIndex || index < currentItemIndex);
+    return { cycle: entry, items: availableItems };
+  }).filter((group) => group.items.length);
+  const selectedReference = referenceGroups.flatMap((group) => group.items.map((entryItem) => ({ ...entryItem, cycle: group.cycle }))).find((entryItem) => entryItem.id === schedule.referenceItemId && entryItem.cycle.id === schedule.referenceCycleId);
+  const update = (field, value) => setForm((current) => ({ ...current, [field]: value }));
+  const updateSchedule = (field, value) => setSchedule((current) => ({ ...current, [field]: value }));
+
+  function submit(event) {
+    event.preventDefault();
+    const timing = schedule.mode === 'dog_age'
+      ? `Aos ${schedule.ageDays} dias de vida`
+      : `${schedule.delayDays} dias após ${selectedReference?.name || 'a aplicação selecionada'}`;
+    onSave({ ...form, timing, schedule: { ...schedule, ageDays: Number(schedule.ageDays), delayDays: Number(schedule.delayDays) } });
+  }
+
+  return createPortal(<div className="cycle-dialog-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+    <form className="cycle-dialog item-dialog flexible-item-dialog" onSubmit={submit}>
+      <header><div><p className="eyebrow">Item do ciclo · {cycle.name}</p><h2>{item ? 'Editar item' : 'Novo item'}</h2></div><button type="button" onClick={onClose}><X /></button></header>
+      <section className="cycle-form-grid">
+        <label className="wide"><span>Nome do item *</span><input required value={form.name} onChange={(event) => update('name', event.target.value)} placeholder="Ex.: Vacina V10" /></label>
+        <label><span>Tipo *</span><select value={form.type} onChange={(event) => update('type', event.target.value)}>{types.map((value) => <option key={value}>{value}</option>)}</select></label>
+        <label><span>Quando solicitar *</span><select value={schedule.mode} onChange={(event) => updateSchedule('mode', event.target.value)}><option value="dog_age">Por idade do cão</option><option value="after_application">Depois de outra aplicação</option></select></label>
+        {schedule.mode === 'dog_age' ? <label className="wide schedule-rule-field"><span>Idade do cão *</span><div><input type="number" min="0" required value={schedule.ageDays} onChange={(event) => updateSchedule('ageDays', event.target.value)} /><em>dias de vida</em></div><small>A notificação será gerada quando o cão atingir essa idade.</small></label> : <>
+          <label className="wide"><span>Aplicação anterior de referência *</span><select required value={schedule.referenceItemId ? `${schedule.referenceCycleId}::${schedule.referenceItemId}` : ''} onChange={(event) => { const [referenceCycleId, referenceItemId] = event.target.value.split('::'); setSchedule((current) => ({ ...current, referenceCycleId, referenceItemId })); }}><option value="">Selecione uma aplicação já realizada</option>{referenceGroups.map((group) => <optgroup label={group.cycle.name} key={group.cycle.id}>{group.items.map((entryItem) => <option value={`${group.cycle.id}::${entryItem.id}`} key={entryItem.id}>{entryItem.name}</option>)}</optgroup>)}</select><small>A referência pode estar em outro ciclo, mas deve ser anterior ao item atual.</small></label>
+          <label className="wide schedule-rule-field"><span>Intervalo após a aplicação *</span><div><input type="number" min="0" required value={schedule.delayDays} onChange={(event) => updateSchedule('delayDays', event.target.value)} /><em>dias depois</em></div></label>
+        </>}
+        <label className="wide"><span>Responsável *</span><input required value={form.responsible} onChange={(event) => update('responsible', event.target.value)} /></label>
+        <label className="cycle-checkbox"><input type="checkbox" checked={form.required} onChange={(event) => update('required', event.target.checked)} /> Item obrigatório</label>
+        <label className="cycle-checkbox"><input type="checkbox" checked={form.active} onChange={(event) => update('active', event.target.checked)} /> Item ativo</label>
+      </section>
+      <footer><button type="button" onClick={onClose}>Cancelar</button><button type="submit" className="primary-action">Salvar item</button></footer>
+    </form>
+  </div>, document.body);
 }
