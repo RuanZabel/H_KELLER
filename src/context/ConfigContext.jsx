@@ -8,6 +8,7 @@ const initialDogBreeds = [
   { name: 'Poodle', active: true },
   { name: 'Outra', active: true }
 ];
+const initialAnimalTypes = [{ name: 'Cão', active: true }];
 const ConfigContext = createContext(null);
 const initialEventLists = [
   {
@@ -17,6 +18,15 @@ const initialEventLists = [
     events: standardHealthProtocol
   }
 ];
+const initialLifecycleCycles = [
+  { id: 'canil', name: 'Canil e neonatal', responsible: 'Administrativo / criador', usedInKanban: true, active: true, items: ['Avaliações iniciais', 'Vermifugação', 'Primeiras vacinas', 'Exames', 'Liberação para socialização'] },
+  { id: 'socializacao', name: 'Socialização', responsible: 'Equipe de socialização', usedInKanban: true, active: true, items: ['Família socializadora', 'Protocolo vacinal', 'Desenvolvimento', 'Alimentação', 'Avaliações periódicas'] },
+  { id: 'aptidao', name: 'Avaliação de aptidão', responsible: 'Equipe técnica', usedInKanban: true, active: true, items: ['Avaliação clínica', 'Exames oftalmológicos', 'PennHIP', 'Radiografias', 'Avaliação comportamental'] },
+  { id: 'castracao', name: 'Transição para treinamento', responsible: 'Veterinário', usedInKanban: true, active: true, items: ['Avaliação clínica', 'Avaliação anestésica', 'Castração', 'Definição da modalidade', 'Liberação para treinamento'] },
+  { id: 'treino', name: 'Treinamento e pré-entrega', responsible: 'Treinador', usedInKanban: true, active: true, items: ['Treinamento formal', 'Treinamento especializado', 'Avaliação pré-entrega', 'Laudo de aptidão'] },
+  { id: 'entrega', name: 'Entrega ao tutor', responsible: 'Equipe técnica', usedInKanban: true, active: true, items: ['Pareamento', 'Adaptação', 'Treinamento conjunto', 'Entrega oficial', 'Plano de acompanhamento'] },
+  { id: 'acompanhamento', name: 'Acompanhamento do tutor', responsible: 'Equipe de acompanhamento', usedInKanban: true, active: true, items: ['Visitas', 'Saúde do cão', 'Desempenho', 'Bem-estar', 'Reavaliações'] }
+];
 
 function normalizeBreeds(breeds) {
   return breeds.map((breed) => {
@@ -25,6 +35,7 @@ function normalizeBreeds(breeds) {
     }
 
     return {
+      ...breed,
       name: breed.name,
       active: breed.active !== false
     };
@@ -37,6 +48,15 @@ function loadBreeds() {
     return stored ? normalizeBreeds(JSON.parse(stored)) : initialDogBreeds;
   } catch {
     return initialDogBreeds;
+  }
+}
+
+function loadAnimalTypes() {
+  try {
+    const stored = localStorage.getItem('hk-animal-types');
+    return stored ? normalizeBreeds(JSON.parse(stored)) : initialAnimalTypes;
+  } catch {
+    return initialAnimalTypes;
   }
 }
 
@@ -83,12 +103,53 @@ function ensureOneActiveList(lists) {
   });
 }
 
+function loadLifecycleCycles() {
+  try {
+    const stored = localStorage.getItem('hk-lifecycle-cycles');
+    return stored ? JSON.parse(stored) : initialLifecycleCycles;
+  } catch {
+    return initialLifecycleCycles;
+  }
+}
+
 export function ConfigProvider({ children }) {
   const [dogBreeds, setDogBreeds] = useState(loadBreeds);
+  const [animalTypes, setAnimalTypes] = useState(loadAnimalTypes);
   const [eventLists, setEventLists] = useState(loadEventLists);
+  const [lifecycleCycles, setLifecycleCycles] = useState(loadLifecycleCycles);
 
-  function addDogBreed(name) {
-    const normalizedName = name.trim();
+  function persistLifecycleCycles(nextCycles) {
+    setLifecycleCycles(nextCycles);
+    localStorage.setItem('hk-lifecycle-cycles', JSON.stringify(nextCycles));
+  }
+
+  function addLifecycleCycle(data) {
+    const cycle = { id: `cycle-${Date.now()}`, name: data.name.trim(), responsible: data.responsible.trim(), usedInKanban: data.usedInKanban !== false, active: data.active !== false, items: data.items.filter(Boolean) };
+    if (!cycle.name) return false;
+    persistLifecycleCycles([...lifecycleCycles, cycle]);
+    return true;
+  }
+
+  function updateLifecycleCycle(id, data) {
+    persistLifecycleCycles(lifecycleCycles.map((cycle) => cycle.id === id ? { ...cycle, ...data, name: data.name.trim(), responsible: data.responsible.trim(), items: data.items.filter(Boolean) } : cycle));
+  }
+
+  function toggleLifecycleCycle(id) {
+    persistLifecycleCycles(lifecycleCycles.map((cycle) => cycle.id === id ? { ...cycle, active: !cycle.active } : cycle));
+  }
+
+  function moveLifecycleCycle(id, direction) {
+    const index = lifecycleCycles.findIndex((cycle) => cycle.id === id);
+    const target = index + direction;
+    if (index < 0 || target < 0 || target >= lifecycleCycles.length) return;
+    const next = [...lifecycleCycles];
+    [next[index], next[target]] = [next[target], next[index]];
+    persistLifecycleCycles(next);
+  }
+
+  function addDogBreed(data) {
+    const values = typeof data === 'string' ? { name: data } : data;
+    const normalizedName = values.name.trim();
     if (!normalizedName) {
       return false;
     }
@@ -98,7 +159,7 @@ export function ConfigProvider({ children }) {
       return false;
     }
 
-    persistBreeds([...dogBreeds, { name: normalizedName, active: true }]);
+    persistBreeds([...dogBreeds, { ...values, name: normalizedName, animalType: values.animalType || 'Cão', available: values.available !== false, active: true }]);
     return true;
   }
 
@@ -109,10 +170,42 @@ export function ConfigProvider({ children }) {
     persistBreeds(nextBreeds);
   }
 
+  function updateDogBreed(name, data) {
+    const normalizedName = data.name.trim();
+    if (!normalizedName) return false;
+    persistBreeds(dogBreeds.map((breed) => breed.name === name ? { ...breed, ...data, name: normalizedName } : breed));
+    return true;
+  }
+
   function persistBreeds(nextBreeds) {
     const sortedBreeds = nextBreeds.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
     setDogBreeds(sortedBreeds);
     localStorage.setItem('hk-dog-breeds', JSON.stringify(sortedBreeds));
+  }
+
+  function addAnimalType(data) {
+    const values = typeof data === 'string' ? { name: data } : data;
+    const normalizedName = values.name.trim();
+    if (!normalizedName || animalTypes.some((type) => type.name.toLowerCase() === normalizedName.toLowerCase())) return false;
+    persistAnimalTypes([...animalTypes, { ...values, name: normalizedName, label: values.label || normalizedName, plural: values.plural || `${normalizedName}s`, active: true }]);
+    return true;
+  }
+
+  function toggleAnimalType(name) {
+    persistAnimalTypes(animalTypes.map((type) => type.name === name ? { ...type, active: !type.active } : type));
+  }
+
+  function updateAnimalType(name, data) {
+    const normalizedName = data.name.trim();
+    if (!normalizedName) return false;
+    persistAnimalTypes(animalTypes.map((type) => type.name === name ? { ...type, ...data, name: normalizedName } : type));
+    return true;
+  }
+
+  function persistAnimalTypes(nextTypes) {
+    const sorted = [...nextTypes].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+    setAnimalTypes(sorted);
+    localStorage.setItem('hk-animal-types', JSON.stringify(sorted));
   }
 
   function createEventListFrom(sourceListId) {
@@ -238,18 +331,28 @@ export function ConfigProvider({ children }) {
   const value = useMemo(() => ({
     activateEventList,
     activeEventList,
+    addAnimalType,
+    addLifecycleCycle,
     addDogBreed,
     addEventList,
     addEventToList,
     activeDogBreeds,
+    animalTypes,
     createEventListFrom,
     deactivateEventList,
     dogBreeds,
     eventLists,
+    lifecycleCycles,
+    moveLifecycleCycle,
     removeEventFromList,
     toggleDogBreed,
+    toggleAnimalType,
+    toggleLifecycleCycle,
+    updateLifecycleCycle,
+    updateDogBreed,
+    updateAnimalType,
     updateEventInList
-  }), [activeDogBreeds, activeEventList, dogBreeds, eventLists]);
+  }), [activeDogBreeds, activeEventList, animalTypes, dogBreeds, eventLists, lifecycleCycles]);
 
   return <ConfigContext.Provider value={value}>{children}</ConfigContext.Provider>;
 }

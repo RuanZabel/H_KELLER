@@ -62,7 +62,7 @@ export default function DogDetailsModal({ dog, origin, trigger, onClose }) {
         <div className="modal-content">
           <div className="modal-column">
             <Section id="phase" className={contextual('phase')} title="Fase atual e critérios de avanço" note={`${dog.criteria?.filter((item) => item.status === 'Concluído').length || 0} de ${dog.criteria?.length || 0} critérios concluídos`}>
-              <div className="detail-summary"><span>Fase macro<strong>{group.title}</strong></span><span>Fase micro<strong>{dog.phase} · {phases[dog.phase - 1]}</strong></span><span>Progresso<strong>{dog.progress}%</strong></span></div>
+              <div className="detail-summary"><span>Fase macro<strong>{group.title}</strong></span><span>Fase micro<strong>{dog.phase > 17 ? 'Pós-entrega · acompanhamento ativo' : `${dog.phase} · ${phases[dog.phase - 1]}`}</strong></span><span>Progresso<strong>{dog.progress}%</strong></span></div>
               <div className="record-list">{(dog.criteria || []).map((item) => <Record key={item.name} {...item} />)}</div>
             </Section>
             <Section id="medication" className={contextual('medication')} title="Medicação" note={`${dog.medications?.filter((item) => item.alert).length || 0} aviso ativo`}>
@@ -106,4 +106,3 @@ function Record({ name, detail, status, date, alert }) {
   return <div className="detail-record">{alert && <AlertCircle size={18} aria-label="Atenção" />}<span><strong>{name}</strong>{detail && <small>{detail}</small>}</span>{status && <b>{status}</b>}{date && <time>{date}</time>}</div>;
 }
 function Empty({ text }) { return <p className="detail-empty">{text}</p>; }
-

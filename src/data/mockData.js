@@ -229,5 +229,11 @@ export const commandGroups = [
 ];
 
 export function groupForDog(dog) {
-  return phaseGroups.find((group) => group.id === dog.group);
+  return phaseGroups.find((group) => group.id === dog.group) || {
+    id: dog.group || 'acompanhamento',
+    title: dog.currentMacroPhaseName || 'Acompanhamento do tutor',
+    phases: 'pós-entrega',
+    span: 'acompanhamento contínuo',
+    color: dog.currentMacroPhaseColor || '#789087'
+  };
 }

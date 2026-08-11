@@ -13,13 +13,13 @@ export const WORK_GROUPS = [
 ];
 
 export const LIFECYCLE_GROUPS = [
-  { id: 'canil', title: 'Canil e neonatal', phases: '1–5', span: '20–55 dias', color: '#839b8b' },
-  { id: 'socializacao', title: 'Socialização', phases: '6–10', span: 'família socializadora', color: '#7f8da3' },
-  { id: 'aptidao', title: 'Avaliação de aptidão', phases: '11–12', span: '6–12 meses', color: '#9b937d' },
-  { id: 'castracao', title: 'Transição para treinamento', phases: '13–15', span: 'define modalidade', color: '#897d91' },
-  { id: 'treino', title: 'Treinamento e pré-entrega', phases: '16', span: 'treino especializado', color: '#7c9289' },
-  { id: 'entrega', title: 'Entrega ao tutor', phases: '17', span: 'adaptação e entrega', color: '#9a8982' },
-  { id: 'acompanhamento', title: 'Acompanhamento do tutor', phases: 'pós-entrega', span: 'acompanhamento contínuo', color: '#789087' }
+  { id: 'canil', title: 'Canil e neonatal', phases: '1–5', firstPhase: 1, span: '20–55 dias', color: '#839b8b' },
+  { id: 'socializacao', title: 'Socialização', phases: '6–10', firstPhase: 6, span: 'família socializadora', color: '#7f8da3' },
+  { id: 'aptidao', title: 'Avaliação de aptidão', phases: '11–12', firstPhase: 11, span: '6–12 meses', color: '#9b937d' },
+  { id: 'castracao', title: 'Transição para treinamento', phases: '13–15', firstPhase: 13, span: 'define modalidade', color: '#897d91' },
+  { id: 'treino', title: 'Treinamento e pré-entrega', phases: '16', firstPhase: 16, span: 'treino especializado', color: '#7c9289' },
+  { id: 'entrega', title: 'Entrega ao tutor', phases: '17', firstPhase: 17, span: 'adaptação e entrega', color: '#9a8982' },
+  { id: 'acompanhamento', title: 'Acompanhamento do tutor', phases: 'pós-entrega', firstPhase: 18, span: 'acompanhamento contínuo', color: '#789087' }
 ];
 
 export function enrichDogs(dogs) {
@@ -33,11 +33,14 @@ export function enrichDogs(dogs) {
       supportModality,
       modalityDefinedAt: supportModality === 'UNDEFINED' ? null : '28/07/2026',
       feeding: { diet: dog.breed === 'Labrador' ? 'Ração Labrador Adult' : 'Ração super premium', amount: dog.phase < 6 ? '360 g/dia' : '420 g/dia', frequency: dog.phase < 6 ? '3 refeições' : '2 refeições', weight: `${22 + index},${index % 10} kg`, updated: '29/07', responsible: 'Equipe de manejo' },
-      criteria: [
+      criteria: isEstrela ? [
         { name: 'Avaliação clínica', detail: 'Concluída em 28/07', status: 'Concluído' },
         { name: 'Hemograma', detail: 'Resultado anexado', status: 'Concluído' },
-        { name: isEstrela ? 'Avaliação anestésica' : 'Próxima avaliação', detail: 'Próximo acontecimento', status: 'Próxima', alert: isEstrela },
+        { name: 'Avaliação anestésica', detail: 'Próximo acontecimento', status: 'Próxima', alert: true },
         { name: 'Critério final da fase', detail: 'Aguardando liberação', status: 'Pendente' }
+      ] : [
+        { name: 'Avaliação da fase', detail: 'Concluída', status: 'Concluído' },
+        { name: 'Registros obrigatórios', detail: 'Conferidos', status: 'Concluído' }
       ],
       medications: isEstrela ? [
         { id: 'med-1', name: 'Antiparasitário', detail: 'Próxima dose · equipe veterinária', status: 'Próximo', date: '03/08', alert: true },

@@ -1,188 +1,105 @@
-import { AlertTriangle, CheckCircle2, FileUp, Plus, Stethoscope, Syringe, Upload } from 'lucide-react';
+import { AlertTriangle, CalendarClock, CheckCircle2, ChevronLeft, ChevronRight, PawPrint, Search } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import PageHeader from '../components/common/PageHeader.jsx';
-import ModuleCard from '../components/common/ModuleCard.jsx';
+import { useNavigate } from 'react-router-dom';
 import { useDogs } from '../context/DogContext.jsx';
-import { buildProtocolForDog } from '../data/healthProtocol.js';
+import { groupForDog, phases } from '../data/mockData.js';
 
-const prescriptions = [
-  { dog: 'Lis', medicine: 'Solução otológica', dose: '4 gotas', frequency: '12/12h', duration: '7 dias', responsible: 'Dra. Helena CRMV 0000' },
-  { dog: 'Nobel', medicine: 'Vermífugo conforme peso', dose: '15 mg/kg', frequency: 'Dose única', duration: 'Repetir em 30 dias', responsible: 'Dr. Rafael CRMV 0000' }
-];
-
-const recordChecklist = [
-  'Identificação do animal: nome/código, espécie, sexo, raça, pelagem, peso e microchip quando houver.',
-  'Identificação do responsável pelo animal, com nome e dados de contato/endereço.',
-  'Data, hora, procedimento realizado, evolução e profissional responsável com número do CRMV.',
-  'Carteira/atestado de vacinação com vacina, dose, lote, fabricante, data de aplicação e assinatura/responsável.',
-  'Anexos comprobatórios: foto da carteira física, laudos, exames, RX, ECG, termos e receitas.',
-  'Receituários legíveis com medicamento, concentração, quantidade, dose, via, frequência e duração.'
-];
+const PAGE_SIZE = 12;
 
 export default function HealthPage() {
   const { dogs } = useDogs();
-  const initialEvents = useMemo(() => flattenProtocolEvents(dogs), [dogs]);
-  const [events, setEvents] = useState(initialEvents);
+  const navigate = useNavigate();
+  const [query, setQuery] = useState('');
+  const [status, setStatus] = useState('all');
+  const [phase, setPhase] = useState('all');
+  const [sort, setSort] = useState('priority');
+  const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    setEvents(initialEvents);
-  }, [initialEvents]);
+  const preparedDogs = useMemo(() => dogs.map((dog) => ({
+    ...dog,
+    healthSummary: buildHealthSummary(dog)
+  })), [dogs]);
 
-  function updateEvent(rowId, field, value) {
-    setEvents((current) => current.map((event) => {
-      if (event.rowId !== rowId) {
-        return event;
-      }
+  const phaseOptions = useMemo(() => Array.from(new Map(preparedDogs.map((dog) => {
+    const group = groupForDog(dog);
+    return [group.id, group.title];
+  })).entries()), [preparedDogs]);
 
-      return {
-        ...event,
-        [field]: value,
-        status: field === 'doneDate' && value ? 'done' : event.status
-      };
-    }));
+  const counts = useMemo(() => ({
+    attention: preparedDogs.filter((dog) => dog.healthSummary.status === 'attention').length,
+    upcoming: preparedDogs.filter((dog) => dog.healthSummary.status === 'upcoming').length,
+    current: preparedDogs.filter((dog) => dog.healthSummary.status === 'current').length
+  }), [preparedDogs]);
+
+  const filteredDogs = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    const result = preparedDogs.filter((dog) => {
+      const searchable = `${dog.name} ${dog.rga} ${dog.code}`.toLowerCase();
+      return (!needle || searchable.includes(needle))
+        && (status === 'all' || dog.healthSummary.status === status)
+        && (phase === 'all' || dog.group === phase);
+    });
+    return [...result].sort((a, b) => {
+      if (sort === 'name') return a.name.localeCompare(b.name, 'pt-BR');
+      if (sort === 'phase') return a.phase - b.phase || a.name.localeCompare(b.name, 'pt-BR');
+      return a.healthSummary.priority - b.healthSummary.priority || a.name.localeCompare(b.name, 'pt-BR');
+    });
+  }, [preparedDogs, query, status, phase, sort]);
+
+  useEffect(() => setPage(1), [query, status, phase, sort]);
+  const pageCount = Math.max(1, Math.ceil(filteredDogs.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+  const visibleDogs = filteredDogs.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  function openDogHealth(dog) {
+    navigate(`/caes/${dog.rga}`, { state: { initialTab: 'saude', fromHealth: true } });
   }
 
-  const doneCount = events.filter((event) => event.doneDate).length;
-  const lateItems = events.filter((event) => event.status === 'late');
-  const pendingItems = events.filter((event) => event.status !== 'done').slice(0, 8);
+  return <section className="screen health-dog-directory animate-in">
+    <header className="health-directory-heading">
+      <div><p className="eyebrow">Módulo de saúde</p><h2>Carteiras de saúde</h2><p>Selecione um cão para acessar protocolo, cuidados e histórico.</p></div>
+      <span><strong>{dogs.length}</strong> {dogs.length === 1 ? 'cão cadastrado' : 'cães cadastrados'}</span>
+    </header>
 
-  return (
-    <section className="screen animate-in">
-      <PageHeader eyebrow="Módulo de saúde" title="Carteira, pendências e receituários">
-        <button className="primary-action"><Plus size={18} /> Registrar evento</button>
-      </PageHeader>
+    <div className="health-directory-toolbar">
+      <label className="health-directory-search"><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar por nome, RGA ou código" /></label>
+      <select value={phase} onChange={(event) => setPhase(event.target.value)} aria-label="Filtrar por fase"><option value="all">Todas as fases</option>{phaseOptions.map(([id, title]) => <option value={id} key={id}>{title}</option>)}</select>
+      <select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Ordenar cães"><option value="priority">Prioridade de saúde</option><option value="name">Nome do cão</option><option value="phase">Fase do ciclo</option></select>
+    </div>
 
-      <div className="module-grid">
-        <ModuleCard icon={Syringe} title="Eventos padrão" description="Vacinas, vermífugos e exames gerados por dias de vida." meta={`${doneCount}/${events.length} feitos`} tone="blue" />
-        <ModuleCard icon={AlertTriangle} title="Pendências clínicas" description="Eventos atrasados ou ainda não registrados por cão." meta={`${lateItems.length} atrasados`} tone="orange" />
-        <ModuleCard icon={Stethoscope} title="Receituários" description="Prescrições com dose, via, frequência, duração e médico-veterinário." meta={`${prescriptions.length} ativos`} tone="amber" />
-      </div>
+    <div className="health-status-filters" aria-label="Filtrar por situação de saúde">
+      <button className={status === 'all' ? 'active' : ''} onClick={() => setStatus('all')}>Todos <span>{dogs.length}</span></button>
+      <button className={status === 'attention' ? 'active' : ''} onClick={() => setStatus('attention')}>Com pendências <span>{counts.attention}</span></button>
+      <button className={status === 'upcoming' ? 'active' : ''} onClick={() => setStatus('upcoming')}>Próximos eventos <span>{counts.upcoming}</span></button>
+      <button className={status === 'current' ? 'active' : ''} onClick={() => setStatus('current')}>Em dia <span>{counts.current}</span></button>
+    </div>
 
-      <div className="health-layout">
-        <section className="vaccination-card">
-          <div className="section-title">
-            <div>
-              <p className="eyebrow">Protocolo automático</p>
-              <h3>Carteira de saúde do primeiro ano</h3>
-            </div>
-            <span>{dogs.length} cães acompanhados</span>
-          </div>
+    {visibleDogs.length ? <div className="health-dog-grid">{visibleDogs.map((dog) => {
+      const group = groupForDog(dog);
+      const summary = dog.healthSummary;
+      const StatusIcon = summary.status === 'attention' ? AlertTriangle : summary.status === 'upcoming' ? CalendarClock : CheckCircle2;
+      return <article className="health-dog-card" key={dog.rga}>
+        <div className="health-dog-identity"><span className="health-dog-avatar"><PawPrint size={22} /></span><div><h3>{dog.name}</h3><small>{dog.rga}</small></div></div>
+        <span className={`health-dog-status ${summary.status}`}><StatusIcon size={15} /> {summary.label}</span>
+        <p>{group.title} · {dog.phase > 17 ? 'Pós-entrega' : `Fase ${dog.phase}`}</p>
+        <div className="health-protocol-progress"><span><small>Protocolo</small><strong>{summary.progress}% realizado</strong></span><div><i style={{ width: `${summary.progress}%` }} /></div></div>
+        <button onClick={() => openDogHealth(dog)}>Acessar página de saúde</button>
+      </article>;
+    })}</div> : <div className="health-directory-empty"><h3>Nenhum cão encontrado</h3><p>Altere a busca ou os filtros para visualizar outros cães.</p></div>}
 
-          <div className="vaccination-table">
-            <div className="vaccination-row header">
-              <span>Cão / evento</span>
-              <span>Prevista</span>
-              <span>Feita em</span>
-              <span>Lote e fabricante</span>
-              <span>Comprovante</span>
-            </div>
-
-            {events.slice(0, 14).map((event) => (
-              <article className={`vaccination-row ${event.status}`} key={event.rowId}>
-                <div>
-                  <strong>{event.dogName}</strong>
-                  <p>{event.name} · {event.type} · {event.ageLabel}</p>
-                  <em>{statusLabel(event.status)}</em>
-                </div>
-                <span>{event.dueDate}</span>
-                <label>
-                  <input
-                    type="date"
-                    value={toInputDate(event.doneDate)}
-                    onChange={(inputEvent) => updateEvent(event.rowId, 'doneDate', fromInputDate(inputEvent.target.value))}
-                    aria-label={`Data realizada ${event.name} ${event.dogName}`}
-                  />
-                </label>
-                <div className="inline-fields">
-                  <input value={event.batch} onChange={(inputEvent) => updateEvent(event.rowId, 'batch', inputEvent.target.value)} placeholder="Lote" aria-label={`Lote ${event.name}`} />
-                  <input value={event.maker} onChange={(inputEvent) => updateEvent(event.rowId, 'maker', inputEvent.target.value)} placeholder="Fabricante" aria-label={`Fabricante ${event.name}`} />
-                </div>
-                <label className="upload-field">
-                  <FileUp size={17} />
-                  <span>{event.proof || 'Enviar foto/PDF'}</span>
-                  <input type="file" accept="image/*,.pdf" onChange={(inputEvent) => updateEvent(event.rowId, 'proof', inputEvent.target.files?.[0]?.name || '')} />
-                </label>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <aside className="timeline-panel">
-          <h3>Pendências</h3>
-          {pendingItems.map((item) => (
-            <article className="work-item" key={`pending-${item.rowId}`}>
-              <AlertTriangle size={18} />
-              <div><strong>{item.name}</strong><p>{item.dogName} · {item.type} · previsto: {item.dueDate}</p></div>
-              <span>{item.status === 'late' ? 'Alta' : 'Média'}</span>
-            </article>
-          ))}
-          <button className="ghost-action full-action"><Plus size={17} /> Criar pendência</button>
-        </aside>
-      </div>
-
-      <div className="split-layout health-secondary">
-        <section className="timeline-panel">
-          <h3>Receituários ativos</h3>
-          {prescriptions.map((prescription) => (
-            <article className="prescription-card" key={`${prescription.dog}-${prescription.medicine}`}>
-              <div>
-                <strong>{prescription.dog}</strong>
-                <span>{prescription.responsible}</span>
-              </div>
-              <p>{prescription.medicine} · {prescription.dose} · {prescription.frequency} · {prescription.duration}</p>
-              <button className="ghost-action"><Upload size={16} /> Anexar receita</button>
-            </article>
-          ))}
-        </section>
-
-        <section className="timeline-panel">
-          <h3>Checklist do prontuário</h3>
-          {recordChecklist.map((item) => (
-            <article className="check-row" key={item}>
-              <CheckCircle2 size={18} />
-              <span>{item}</span>
-            </article>
-          ))}
-        </section>
-      </div>
-    </section>
-  );
+    <footer className="health-directory-pagination">
+      <span>{filteredDogs.length ? `Exibindo ${(safePage - 1) * PAGE_SIZE + 1}–${Math.min(safePage * PAGE_SIZE, filteredDogs.length)} de ${filteredDogs.length} cães` : 'Nenhum cão para exibir'}</span>
+      {pageCount > 1 && <div><button onClick={() => setPage((current) => Math.max(1, current - 1))} disabled={safePage === 1} aria-label="Página anterior"><ChevronLeft size={17} /></button>{Array.from({ length: pageCount }, (_, index) => index + 1).map((number) => <button className={number === safePage ? 'active' : ''} onClick={() => setPage(number)} key={number} aria-label={`Página ${number}`}>{number}</button>)}<button onClick={() => setPage((current) => Math.min(pageCount, current + 1))} disabled={safePage === pageCount} aria-label="Próxima página"><ChevronRight size={17} /></button></div>}
+    </footer>
+  </section>;
 }
 
-function flattenProtocolEvents(dogs) {
-  return dogs.flatMap((dog) => buildProtocolForDog(dog).map((event) => ({
-    ...event,
-    dogName: dog.name,
-    dogRga: dog.rga,
-    rowId: `${dog.rga}-${event.id}`
-  })));
-}
-
-function statusLabel(status) {
-  const labels = {
-    done: 'Aplicada',
-    late: 'Atrasada',
-    pending: 'Pendente',
-    scheduled: 'Agendada'
-  };
-
-  return labels[status] || status;
-}
-
-function toInputDate(value) {
-  if (!value) {
-    return '';
-  }
-
-  const [day, month, year] = value.split('/');
-  return `${year}-${month}-${day}`;
-}
-
-function fromInputDate(value) {
-  if (!value) {
-    return '';
-  }
-
-  const [year, month, day] = value.split('-');
-  return `${day}/${month}/${year}`;
+function buildHealthSummary(dog) {
+  const workItems = dog.workItems || [];
+  const attentionItems = workItems.filter((item) => item.isOverdue || item.blocksPhase || ['critical', 'high'].includes(item.severity));
+  const upcomingItems = workItems.filter((item) => !item.isOverdue && !item.blocksPhase && item.dueDate);
+  const progress = Math.max(48, Math.min(100, 100 - attentionItems.length * 11 - upcomingItems.length * 5));
+  if (attentionItems.length || dog.alert) return { status: 'attention', priority: 0, progress, label: `${Math.max(attentionItems.length, 1)} ${Math.max(attentionItems.length, 1) === 1 ? 'pendência' : 'pendências'}` };
+  if (upcomingItems.length) return { status: 'upcoming', priority: 1, progress, label: upcomingItems[0].displayDate ? `Evento ${upcomingItems[0].displayDate}` : 'Próximo evento' };
+  return { status: 'current', priority: 2, progress: 100, label: 'Saúde em dia' };
 }

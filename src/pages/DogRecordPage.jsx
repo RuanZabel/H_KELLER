@@ -18,6 +18,7 @@ import { useParams } from 'react-router-dom';
 import { commandGroups, groupForDog, healthEvents, phases } from '../data/mockData.js';
 import { useDogs } from '../context/DogContext.jsx';
 import { buildProtocolForDog } from '../data/healthProtocol.js';
+import DogCareRecordPage from '../components/dogs/DogCareRecordPage.jsx';
 
 export default function DogRecordPage() {
   const { rga } = useParams();
@@ -25,6 +26,9 @@ export default function DogRecordPage() {
   const { dogs, findDogByRga } = useDogs();
   const dog = findDogByRga(rga) || dogs[0];
   const group = groupForDog(dog);
+  return <DogCareRecordPage dog={dog} group={group} />;
+
+  /* A implementação anterior permanece abaixo como referência dos fluxos legados. */
   const tabs = [
     ['dados', 'Dados do animal', Dog],
     ['saude', 'Saúde', HeartPulse],

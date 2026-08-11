@@ -34,10 +34,33 @@ export function DogProvider({ children }) {
     return dogs.find((dog) => dog.rga === rga);
   }
 
+  function moveDogToGroup(rga, group, phase, groupTitle, groupColor) {
+    setDogs((current) => current.map((dog) => (
+      dog.rga === rga
+        ? {
+            ...dog,
+            group,
+            phase,
+            currentMacroPhaseName: groupTitle,
+            currentMacroPhaseColor: groupColor,
+            timeline: [
+              {
+                date: new Intl.DateTimeFormat('pt-BR').format(new Date()),
+                title: 'Mudança de fase',
+                description: `Movido para uma nova etapa do ciclo de vida.`
+              },
+              ...(dog.timeline || [])
+            ]
+          }
+        : dog
+    )));
+  }
+
   const value = useMemo(() => ({
     addDog,
     dogs,
-    findDogByRga
+    findDogByRga,
+    moveDogToGroup
   }), [dogs]);
 
   return <DogContext.Provider value={value}>{children}</DogContext.Provider>;
