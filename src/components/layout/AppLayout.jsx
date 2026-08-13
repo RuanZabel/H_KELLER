@@ -1,10 +1,8 @@
 import {
-  ClipboardList,
   ChevronDown,
   Dog,
   LogOut,
   RefreshCw,
-  ShieldCheck,
   UserCog
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -19,7 +17,6 @@ export default function AppLayout() {
 
   return (
     <div className="app-shell">
-      <Header />
       <nav className="top-nav" aria-label="Navegação principal">
         <div className="nav-scroll">
           {navigationRoutes.map((item) => <NavItem key={item.path} {...item} />)}
@@ -34,28 +31,6 @@ export default function AppLayout() {
         <Outlet />
       </main>
     </div>
-  );
-}
-
-function Header() {
-  return (
-    <header className="brand-header">
-      <div className="brand-mark">
-        <div className="logo-badge"><Dog size={30} /></div>
-        <div>
-          <strong>Escola Helen Keller</strong>
-          <span>Prontuário Digital do Cão</span>
-        </div>
-      </div>
-      <div className="header-title">
-        <p>Controle interno · MVP 1º ano de vida</p>
-        <h1>Fonte única para saúde, fases, documentos e responsáveis</h1>
-      </div>
-      <div className="cert-stack">
-        <span><ShieldCheck size={16} /> Acessível</span>
-        <span><ClipboardList size={16} /> Auditável</span>
-      </div>
-    </header>
   );
 }
 
