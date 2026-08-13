@@ -51,8 +51,10 @@ export default function DashboardPage() {
   function confirmMove() {
     if (!pendingMove) return;
     const { dog, targetGroup } = pendingMove;
-    moveDogToGroup(dog.rga, targetGroup.id, targetGroup.firstPhase, targetGroup.title, targetGroup.color);
-    setMovementMessage(`${dog.name} foi movido para ${targetGroup.title}.`);
+    const targetCycle = lifecycleCycles.find((cycle) => cycle.id === targetGroup.id);
+    const triggeredItems = (targetCycle?.items || []).filter((item) => typeof item === 'object' && item.active !== false && item.schedule?.mode === 'lane_entry' && (item.schedule.targetCycleId || targetCycle.id) === targetGroup.id).map((item) => ({ id: `lane-${dog.rga}-${item.id}`, sourceItemId: item.id, category: item.type?.toLowerCase() || 'outro', categoryLabel: item.type || 'Item do ciclo', title: item.name, displayDate: 'Ao entrar na raia', severity: item.required ? 'high' : 'medium', status: 'Pendente', responsible: item.responsible, required: item.required, blocksPhase: item.required }));
+    moveDogToGroup(dog.rga, targetGroup.id, targetGroup.firstPhase, targetGroup.title, targetGroup.color, triggeredItems);
+    setMovementMessage(`${dog.name} foi movido para ${targetGroup.title}.${triggeredItems.length ? ` ${triggeredItems.length} ${triggeredItems.length === 1 ? 'pendência foi criada' : 'pendências foram criadas'}.` : ''}`);
     setPendingMove(null);
   }
 

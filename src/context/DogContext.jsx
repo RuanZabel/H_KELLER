@@ -34,7 +34,7 @@ export function DogProvider({ children }) {
     return dogs.find((dog) => dog.rga === rga);
   }
 
-  function moveDogToGroup(rga, group, phase, groupTitle, groupColor) {
+  function moveDogToGroup(rga, group, phase, groupTitle, groupColor, triggeredItems = []) {
     setDogs((current) => current.map((dog) => (
       dog.rga === rga
         ? {
@@ -43,6 +43,14 @@ export function DogProvider({ children }) {
             phase,
             currentMacroPhaseName: groupTitle,
             currentMacroPhaseColor: groupColor,
+            workItems: [
+              ...triggeredItems.filter((item) => !(dog.workItems || []).some((existing) => existing.sourceItemId === item.sourceItemId)),
+              ...(dog.workItems || [])
+            ],
+            criteria: [
+              ...triggeredItems.filter((item) => item.required && !(dog.criteria || []).some((criterion) => criterion.sourceItemId === item.sourceItemId)).map((item) => ({ name: item.title, detail: `Solicitado ao entrar em ${groupTitle}`, status: 'Pendente', alert: true, sourceItemId: item.sourceItemId })),
+              ...(dog.criteria || [])
+            ],
             timeline: [
               {
                 date: new Intl.DateTimeFormat('pt-BR').format(new Date()),

@@ -62,7 +62,7 @@ function ItemDialog({ item, cycle, onClose, onSave }) {
 }
 
 function FlexibleItemDialog({ item, cycle, lifecycleCycles, onClose, onSave }) {
-  const defaultSchedule = item?.schedule || { mode: 'dog_age', ageDays: 20, delayDays: 10, referenceCycleId: '', referenceItemId: '' };
+  const defaultSchedule = item?.schedule || { mode: 'dog_age', ageDays: 20, delayDays: 10, referenceCycleId: '', referenceItemId: '', targetCycleId: cycle.id };
   const [form, setForm] = useState(item || { name: '', type: 'Outro', required: true, responsible: cycle.responsible, active: true });
   const [schedule, setSchedule] = useState(defaultSchedule);
   const currentCycleIndex = lifecycleCycles.findIndex((entry) => entry.id === cycle.id);
@@ -80,9 +80,12 @@ function FlexibleItemDialog({ item, cycle, lifecycleCycles, onClose, onSave }) {
 
   function submit(event) {
     event.preventDefault();
+    const targetCycle = lifecycleCycles.find((entry) => entry.id === schedule.targetCycleId) || cycle;
     const timing = schedule.mode === 'dog_age'
       ? `Aos ${schedule.ageDays} dias de vida`
-      : `${schedule.delayDays} dias após ${selectedReference?.name || 'a aplicação selecionada'}`;
+      : schedule.mode === 'lane_entry'
+        ? `Ao entrar na raia ${targetCycle.name}`
+        : `${schedule.delayDays} dias após ${selectedReference?.name || 'a aplicação selecionada'}`;
     onSave({ ...form, timing, schedule: { ...schedule, ageDays: Number(schedule.ageDays), delayDays: Number(schedule.delayDays) } });
   }
 
@@ -92,8 +95,8 @@ function FlexibleItemDialog({ item, cycle, lifecycleCycles, onClose, onSave }) {
       <section className="cycle-form-grid">
         <label className="wide"><span>Nome do item *</span><input required value={form.name} onChange={(event) => update('name', event.target.value)} placeholder="Ex.: Vacina V10" /></label>
         <label><span>Tipo *</span><select value={form.type} onChange={(event) => update('type', event.target.value)}>{types.map((value) => <option key={value}>{value}</option>)}</select></label>
-        <label><span>Quando solicitar *</span><select value={schedule.mode} onChange={(event) => updateSchedule('mode', event.target.value)}><option value="dog_age">Por idade do cão</option><option value="after_application">Depois de outra aplicação</option></select></label>
-        {schedule.mode === 'dog_age' ? <label className="wide schedule-rule-field"><span>Idade do cão *</span><div><input type="number" min="0" required value={schedule.ageDays} onChange={(event) => updateSchedule('ageDays', event.target.value)} /><em>dias de vida</em></div><small>A notificação será gerada quando o cão atingir essa idade.</small></label> : <>
+        <label><span>Quando solicitar *</span><select value={schedule.mode} onChange={(event) => updateSchedule('mode', event.target.value)}><option value="dog_age">Por idade do cão</option><option value="after_application">Depois de outra aplicação</option><option value="lane_entry">Ao entrar em uma raia</option></select></label>
+        {schedule.mode === 'dog_age' ? <label className="wide schedule-rule-field"><span>Idade do cão *</span><div><input type="number" min="0" required value={schedule.ageDays} onChange={(event) => updateSchedule('ageDays', event.target.value)} /><em>dias de vida</em></div><small>A notificação será gerada quando o cão atingir essa idade.</small></label> : schedule.mode === 'lane_entry' ? <label className="wide schedule-rule-field"><span>Raia que gera a pendência *</span><select required value={schedule.targetCycleId || cycle.id} onChange={(event) => updateSchedule('targetCycleId', event.target.value)}>{lifecycleCycles.filter((entry) => entry.active && entry.usedInKanban).map((entry) => <option value={entry.id} key={entry.id}>{entry.name}</option>)}</select><small>Assim que o cão for movido para essa raia, o item aparecerá como pendência para o responsável.</small></label> : <>
           <label className="wide"><span>Aplicação anterior de referência *</span><select required value={schedule.referenceItemId ? `${schedule.referenceCycleId}::${schedule.referenceItemId}` : ''} onChange={(event) => { const [referenceCycleId, referenceItemId] = event.target.value.split('::'); setSchedule((current) => ({ ...current, referenceCycleId, referenceItemId })); }}><option value="">Selecione uma aplicação já realizada</option>{referenceGroups.map((group) => <optgroup label={group.cycle.name} key={group.cycle.id}>{group.items.map((entryItem) => <option value={`${group.cycle.id}::${entryItem.id}`} key={entryItem.id}>{entryItem.name}</option>)}</optgroup>)}</select><small>A referência pode estar em outro ciclo, mas deve ser anterior ao item atual.</small></label>
           <label className="wide schedule-rule-field"><span>Intervalo após a aplicação *</span><div><input type="number" min="0" required value={schedule.delayDays} onChange={(event) => updateSchedule('delayDays', event.target.value)} /><em>dias depois</em></div></label>
         </>}
