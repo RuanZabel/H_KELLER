@@ -1,4 +1,4 @@
-import { AlertTriangle, Check, Dog, Save, Search, X } from 'lucide-react';
+import { AlertTriangle, Camera, Check, ChevronLeft, ChevronRight, Dog, Save, Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PageHeader from '../components/common/PageHeader.jsx';
@@ -55,6 +55,8 @@ export default function NewDogPage() {
   const [form, setForm] = useState(initialForm);
   const [submitted, setSubmitted] = useState(false);
   const [parentPicker, setParentPicker] = useState(null);
+  const [step, setStep] = useState(0);
+  const steps = ['Identificação', 'Origem e filiação', 'Saúde inicial', 'Revisão'];
 
   const generatedCode = useMemo(() => {
     const year = new Date().getFullYear();
@@ -144,55 +146,44 @@ export default function NewDogPage() {
     navigate(`/caes/${newDog.rga}`);
   }
 
+  function nextStep() {
+    const stepRequired = step === 0 ? ['name', 'sex', 'color', 'birthDate'] : step === 1 ? ['origin', 'category'] : [];
+    const missing = stepRequired.filter((field) => !form[field]);
+    if (missing.length) {
+      setSubmitted(true);
+      return;
+    }
+    setSubmitted(false);
+    setStep((current) => Math.min(current + 1, steps.length - 1));
+  }
+
   return (
-    <section className="screen animate-in">
-      <PageHeader eyebrow="Novo prontuário" title="Cadastro do cão">
+    <section className="screen new-dog-wizard animate-in">
+      <PageHeader eyebrow="Novo registro" title="Cadastrar cão">
         <span className="generated-code"><Dog size={18} /> {generatedCode}</span>
       </PageHeader>
+      <p className="wizard-intro">Preencha os dados em quatro etapas curtas. Você poderá complementar o prontuário depois.</p>
+      <nav className="dog-wizard-steps" aria-label="Etapas do cadastro">{steps.map((label, index) => <button type="button" key={label} className={`${index === step ? 'active' : ''} ${index < step ? 'completed' : ''}`} onClick={() => index < step && setStep(index)}><span>{index < step ? <Check size={15} /> : index + 1}</span><strong>{label}</strong></button>)}</nav>
 
-      <form className="record-form" onSubmit={handleSubmit}>
-        <aside className="form-summary">
-          <div className="avatar large">🐾</div>
-          <div>
-            <p className="eyebrow">Código HK automático</p>
-            <h3>{generatedCode}</h3>
-            <p>O código é gerado pelo sistema e não deve ser editado manualmente.</p>
-          </div>
-          {!form.microchip && (
-            <div className="form-alert">
-              <AlertTriangle size={18} />
-              <span>Microchip pode ser preenchido depois, mas ficará pendente antes da socialização.</span>
-            </div>
-          )}
-          {submitted && canSave && (
-            <div className="form-success">
-              <Check size={18} />
-              <span>Cadastro validado no frontend. Pronto para integração com API.</span>
-            </div>
-          )}
-        </aside>
-
-        <div className="form-sections">
-          <FormSection title="Dados obrigatórios" description="Informações mínimas para abrir um prontuário único.">
+      <form className="dog-wizard-form" onSubmit={handleSubmit}>
+        {step === 0 && <FormSection title="Identificação do animal" description="Informações principais para criar o prontuário único.">
+            <label className="dog-photo-field"><Camera size={28} /><strong>Adicionar foto</strong><span>JPG ou PNG</span><input type="file" accept="image/*" /></label>
             <TextField label="Nome" value={form.name} onChange={(value) => updateField('name', value)} required />
+            <SelectField label="Tipo de animal" value="Cão" onChange={() => {}} options={['Cão']} required />
+            <SelectField label="Raça" value={form.breed} onChange={(value) => updateField('breed', value)} options={['', ...activeDogBreeds]} />
             <SelectField label="Sexo" value={form.sex} onChange={(value) => updateField('sex', value)} options={['', 'Macho', 'Fêmea']} required />
             <TextField label="Cor" value={form.color} onChange={(value) => updateField('color', value)} required />
             <DateField label="Data de nascimento" value={form.birthDate} onChange={(value) => updateField('birthDate', value)} required />
-            <SelectField label="Procedência" value={form.origin} onChange={(value) => updateField('origin', value)} options={['', 'Escola', 'Canil externo']} required />
-            <SelectField label="Categoria" value={form.category} onChange={(value) => updateField('category', value)} options={['', 'Guia', 'Serviço', 'Terapia', 'Outro']} required />
-          </FormSection>
-
-          <FormSection title="Identificação e características" description="Dados complementares usados na carteira digital e no prontuário.">
             <TextField label="Microchip" value={form.microchip} onChange={(value) => updateField('microchip', value)} placeholder="Pode ficar pendente" />
-            <SelectField label="Raça" value={form.breed} onChange={(value) => updateField('breed', value)} options={['', ...activeDogBreeds]} />
             <TextField label="Pelagem" value={form.coat} onChange={(value) => updateField('coat', value)} />
             <NumberField label="Peso inicial (kg)" value={form.initialWeight} onChange={(value) => updateField('initialWeight', value)} />
+          </FormSection>}
+
+          {step === 1 && <FormSection title="Origem e filiação" description="Procedência e histórico familiar do cão.">
+            <SelectField label="Procedência" value={form.origin} onChange={(value) => updateField('origin', value)} options={['', 'Escola', 'Canil externo']} required />
+            <SelectField label="Categoria" value={form.category} onChange={(value) => updateField('category', value)} options={['', 'Guia', 'Serviço', 'Terapia', 'Outro']} required />
             <TextField label="Pedigree" value={form.pedigree} onChange={(value) => updateField('pedigree', value)} />
             <ToggleField label="É reprodutor" checked={form.isBreeder} onChange={(value) => updateField('isBreeder', value)} />
-            <SelectField label="Fase inicial" value={form.initialPhase} onChange={(value) => updateField('initialPhase', value)} options={phases.map((phase, index) => `${index + 1} · ${phase}`)} />
-          </FormSection>
-
-          <FormSection title="Filiação" description="Histórico pré-nascimento, com vínculo interno ou cadastro manual do canil.">
             <ParentField
               label="Mãe"
               origin={form.motherOrigin}
@@ -219,11 +210,16 @@ export default function NewDogPage() {
             <TextArea label="Temperamento dos pais" value={form.temperament} onChange={(value) => updateField('temperament', value)} />
             <TextArea label="Doenças crônicas conhecidas" value={form.chronicDiseases} onChange={(value) => updateField('chronicDiseases', value)} />
             <TextArea label="Dados do canil externo" value={form.kennelData} onChange={(value) => updateField('kennelData', value)} />
-          </FormSection>
+          </FormSection>}
 
-          <FormSection title="Observações iniciais" description="Registro livre para contexto clínico, manejo ou implantação histórica.">
+          {step === 2 && <FormSection title="Saúde e entrada no ciclo" description="Dados iniciais para gerar os primeiros acompanhamentos.">
+            <SelectField label="Fase inicial" value={form.initialPhase} onChange={(value) => updateField('initialPhase', value)} options={phases.map((phase, index) => `${index + 1} · ${phase}`)} />
+            <TextArea label="Doenças crônicas conhecidas" value={form.chronicDiseases} onChange={(value) => updateField('chronicDiseases', value)} />
             <TextArea label="Observações" value={form.notes} onChange={(value) => updateField('notes', value)} wide />
-          </FormSection>
+            {!form.microchip && <div className="wizard-health-alert"><AlertTriangle size={18} /><span>Microchip pendente: poderá ser informado depois, mas será exigido antes da socialização.</span></div>}
+          </FormSection>}
+
+          {step === 3 && <section className="dog-review-panel"><header><div className="dog-review-avatar">🐾</div><div><p className="eyebrow">Prontuário a criar</p><h3>{form.name || 'Nome não informado'}</h3><span>{generatedCode}</span></div></header><div className="dog-review-grid"><Review label="Tipo e raça" value={`Cão · ${form.breed || 'A definir'}`} /><Review label="Sexo" value={form.sex} /><Review label="Nascimento" value={fromInputDate(form.birthDate)} /><Review label="Procedência" value={form.origin} /><Review label="Categoria" value={form.category} /><Review label="Fase inicial" value={form.initialPhase} /><Review label="Microchip" value={form.microchip || 'Pendente'} /><Review label="Protocolo" value={activeEventList.name} /></div><aside><Check size={18} />Ao concluir, o cão será adicionado ao Kanban e receberá o protocolo configurado.</aside></section>}
 
           {submitted && !canSave && (
             <div className="validation-panel">
@@ -232,11 +228,10 @@ export default function NewDogPage() {
             </div>
           )}
 
-          <div className="form-actions">
+          <div className="form-actions dog-wizard-actions">
             <Link className="ghost-action" to="/caes">Cancelar</Link>
-            <button className="primary-action" type="submit"><Save size={18} /> Salvar cadastro</button>
+            <div>{step > 0 && <button className="ghost-action" type="button" onClick={() => setStep((current) => current - 1)}><ChevronLeft size={17} /> Voltar</button>}{step < steps.length - 1 ? <button className="primary-action" type="button" onClick={nextStep}>Continuar <ChevronRight size={17} /></button> : <button className="primary-action" type="submit"><Save size={18} /> Cadastrar cão</button>}</div>
           </div>
-        </div>
       </form>
 
       {parentPicker && (
@@ -264,6 +259,10 @@ function FormSection({ title, description, children }) {
       <div className="form-grid">{children}</div>
     </fieldset>
   );
+}
+
+function Review({ label, value }) {
+  return <div><span>{label}</span><strong>{value || 'Não informado'}</strong></div>;
 }
 
 function TextField({ label, value, onChange, placeholder = '', required = false }) {

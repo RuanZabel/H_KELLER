@@ -288,3 +288,34 @@
   margin: 0;
   color: var(--muted);
 }
+
+.new-dog-wizard .screen-heading { align-items: center; }
+.wizard-intro { margin: -10px 0 18px; color: var(--muted); }
+.dog-wizard-steps { display: grid; grid-template-columns: repeat(4, 1fr); margin-bottom: 18px; }
+.dog-wizard-steps button { display: flex; align-items: center; gap: 10px; min-height: 58px; padding: 8px 14px; border: 0; border-bottom: 3px solid var(--line); color: var(--muted); background: transparent; text-align: left; }
+.dog-wizard-steps button > span { display: grid; place-items: center; width: 30px; height: 30px; flex: 0 0 auto; border-radius: 50%; color: #536058; background: #e8ece6; }
+.dog-wizard-steps button.active { color: var(--forest); border-bottom-color: var(--leaf); }
+.dog-wizard-steps button.active > span, .dog-wizard-steps button.completed > span { color: #fff; background: var(--forest); }
+.dog-wizard-steps button.completed { color: var(--forest); cursor: pointer; }
+.dog-wizard-form { display: grid; gap: 14px; }
+.dog-wizard-form .form-section { min-height: 360px; }
+.dog-wizard-form .form-section > .form-grid { grid-template-columns: repeat(3, 1fr); }
+.dog-photo-field { grid-row: span 2; display: grid; place-items: center; align-content: center; gap: 8px; min-height: 150px; border: 1px dashed #8dae92; border-radius: 8px; color: var(--forest); background: #f4f9f2; cursor: pointer; }
+.dog-photo-field span { color: var(--muted); font-size: .75rem; }
+.dog-photo-field input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.wizard-health-alert { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; padding: 13px; border: 1px solid #ead4a4; border-radius: 7px; color: #6c5930; background: #fffaf0; }
+.dog-review-panel { min-height: 360px; padding: 22px; border: 1px solid var(--line); border-radius: 9px; background: #fff; }
+.dog-review-panel > header { display: flex; align-items: center; gap: 14px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+.dog-review-avatar { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; color: var(--forest); background: #e5f3e4; font-size: 1.65rem; }
+.dog-review-panel h3, .dog-review-panel p { margin: 0; }
+.dog-review-panel h3 { color: var(--forest); font-size: 1.25rem; }
+.dog-review-panel header span { color: var(--muted); }
+.dog-review-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin: 18px 0; background: var(--line); }
+.dog-review-grid > div { display: grid; gap: 5px; padding: 14px; background: #fff; }
+.dog-review-grid span { color: var(--muted); font-size: .76rem; }
+.dog-review-panel aside { display: flex; align-items: center; gap: 9px; padding: 13px; border: 1px solid #bed7c2; border-radius: 7px; color: var(--forest); background: #f3f9f2; }
+.dog-wizard-actions { display: flex; align-items: center; justify-content: space-between; }
+.dog-wizard-actions > div { display: flex; gap: 10px; }
+.dog-wizard-actions button { display: flex; align-items: center; gap: 7px; }
+@media (max-width: 850px) { .dog-wizard-form .form-section > .form-grid { grid-template-columns: 1fr 1fr; }.dog-review-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 580px) { .dog-wizard-steps { grid-template-columns: 1fr 1fr; }.dog-wizard-steps button { min-height: 50px; }.dog-wizard-form .form-section > .form-grid, .dog-review-grid { grid-template-columns: 1fr; }.dog-wizard-actions { align-items: stretch; flex-direction: column-reverse; }.dog-wizard-actions > div { flex-direction: column-reverse; }.dog-wizard-actions a, .dog-wizard-actions button { justify-content: center; width: 100%; } }
