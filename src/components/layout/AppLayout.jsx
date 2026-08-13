@@ -4,7 +4,8 @@ import {
   Dog,
   LogOut,
   RefreshCw,
-  ShieldCheck
+  ShieldCheck,
+  UserCog
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -78,7 +79,8 @@ function ConfigMenu({ Icon, label }) {
   const active = location.pathname.startsWith('/config');
   const items = [
     { to: '/config/ciclos', label: 'Cadastro do ciclo', Icon: RefreshCw },
-    { to: '/config/tipos-animais', label: 'Raças e tipos de animais', Icon: Dog, relatedPath: '/config/racas' }
+    { to: '/config/tipos-animais', label: 'Raças e tipos de animais', Icon: Dog, relatedPath: '/config/racas' },
+    { to: '/config/usuarios', label: 'Cadastro de usuários', Icon: UserCog }
   ];
 
   function toggleSubmenu() {

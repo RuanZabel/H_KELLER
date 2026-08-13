@@ -1,4 +1,5 @@
 import { createContext, useContext, useMemo, useState } from 'react';
+import { authenticateUser } from '../utils/userStorage.js';
 
 const AuthContext = createContext(null);
 
@@ -14,13 +15,13 @@ export function AuthProvider({ children }) {
     return stored ? JSON.parse(stored) : null;
   });
 
-  function login(credentials) {
-    const nextUser = {
-      ...defaultUser,
-      email: credentials.email || defaultUser.email
-    };
+  async function login(credentials) {
+    const authenticated = await authenticateUser(credentials.email, credentials.password);
+    if (!authenticated) return false;
+    const nextUser = { name: authenticated.name, email: authenticated.login, role: authenticated.role === 'Admin' ? 'Administrador' : authenticated.role };
     localStorage.setItem('hk_user', JSON.stringify(nextUser));
     setUser(nextUser);
+    return true;
   }
 
   function logout() {

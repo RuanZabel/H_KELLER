@@ -9,10 +9,12 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [credentials, setCredentials] = useState({ email: 'equipe@helenkeller.local', password: 'demo123' });
+  const [error, setError] = useState('');
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    login(credentials);
+    const authenticated = await login(credentials);
+    if (!authenticated) { setError('Login ou senha inválidos, ou usuário desativado.'); return; }
     navigate(location.state?.from?.pathname || '/painel', { replace: true });
   }
 
@@ -22,7 +24,7 @@ export default function LoginPage() {
         <div>
           <p className="eyebrow">Acesso restrito</p>
           <h2>Entrar no sistema</h2>
-          <p>Use qualquer e-mail e senha para acessar esta versão demonstrativa.</p>
+          <p>Informe o login e a senha cadastrados pelo administrador.</p>
         </div>
         <label className="icon-field">
           <span>E-mail</span>
@@ -35,6 +37,7 @@ export default function LoginPage() {
             required
           />
         </label>
+        {error && <p className="login-error" role="alert">{error}</p>}
         <label className="icon-field">
           <span>Senha</span>
           <Lock size={18} />

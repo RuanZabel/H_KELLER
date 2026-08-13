@@ -12,6 +12,7 @@ import AnimalTypesConfigPage from '../pages/AnimalTypesConfigPage.jsx';
 import LifecycleItemsPage from '../pages/LifecycleItemsPage.jsx';
 import LifecycleEditPage from '../pages/LifecycleEditPage.jsx';
 import AnimalTypeEditPage from '../pages/AnimalTypeEditPage.jsx';
+import UsersConfigPage from '../pages/UsersConfigPage.jsx';
 import { privateRoutes } from './routeConfig.jsx';
 
 export default function AppRoutes() {
@@ -34,6 +35,7 @@ export default function AppRoutes() {
           <Route path="/config/racas" element={<BreedsConfigPage />} />
           <Route path="/config/tipos-animais" element={<AnimalTypesConfigPage />} />
           <Route path="/config/tipos-animais/:typeName/editar" element={<AnimalTypeEditPage />} />
+          <Route path="/config/usuarios" element={<UsersConfigPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Route>
