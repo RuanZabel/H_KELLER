@@ -41,7 +41,6 @@ export default function LifecycleItemsPage() {
   const requiredCount = items.filter((item) => item.required).length;
 
   return <section className="screen lifecycle-items-screen animate-in">
-    <nav className="items-breadcrumb"><button onClick={() => navigate('/config/ciclos')}>← Configurações</button><span>/</span><button onClick={() => navigate('/config/ciclos')}>Ciclos do ciclo de vida</button><span>/</span><strong>{cycle.name}</strong><span>/</span><b>Itens</b></nav>
     <header className="lifecycle-items-heading"><div><h2>Itens do ciclo — {cycle.name}</h2><p>Gerencie as informações e controles exibidos no cadastro do cão durante esta fase.</p></div><div><button className="ghost-action" onClick={() => navigate('/config/ciclos')}><Pencil size={17} /> Editar ciclo</button><button className="primary-action" onClick={() => setDialog({ item: null })}><Plus size={18} /> Novo item</button></div></header>
     <section className="cycle-item-summary"><div className="cycle-item-symbol"><Users size={34} /></div><div><h3>{cycle.name} <span className="cycle-status active">Ativo</span></h3><p>{cycle.responsible}</p><small><ClipboardList size={15} /> {items.length} itens configurados</small></div><aside><Info size={22} /><span>Os itens abaixo aparecem no cadastro do cão<br />enquanto ele estiver nesta fase.</span></aside></section>
     <section className="lifecycle-items-panel">
